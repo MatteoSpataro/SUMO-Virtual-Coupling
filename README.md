@@ -25,3 +25,9 @@ Getting started
 To get started with these SUMO scenarios, take a look at the user documentation provided in 
 
 CONTINUE...
+
+
+License
+-------
+
+SUMO is licensed under the [Eclipse Public License Version 2](https://eclipse.org/legal/epl-v20.html).

@@ -1,0 +1,12 @@
+<routes>	
+	<vType id="rail1" vClass="rail" length="120" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="0,0,1"/>
+	<vType id="rail2" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="1,0,0"/>
+	
+	<route id="cycle" edges="E2 E4 E5 E6 E7 E8 E9 E10 E11 E12 E13 E14 E15 E16 E17 E18 E19 E20 
+	E1 E2 E4 E5 E6 E7 E8 E9 E10 E11 E12 E13 E14 E15 E16 E17 E18 E19 E20"/>
+	<route id="cycle2" edges="E1 E2 E4 E5 E6 E7 E8 E9 E10 E11 E12 E13 E14 E15 E16 E17 E18 E19 E20 
+	E1 E2 E4 E5 E6 E7 E8 E9 E10 E11 E12 E13 E14 E15 E16 E17 E18 E19 E20"/>
+	
+	<vehicle id="1" type="rail1" route="cycle" depart="0" />
+	<vehicle id="2" type="rail2" route="cycle2" depart="0" />
+</routes>

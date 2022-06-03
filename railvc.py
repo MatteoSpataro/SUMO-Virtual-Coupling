@@ -13,7 +13,12 @@ import traci
 
 def get_options():
     opt_parser = optparse.OptionParser()
-    opt_parser.add_option("--nogui", action="store_true", default=False, help="run the commandline version of sumo")
+    opt_parser.add_option("--nogui", action="store_true", default=False, 
+                          help="Run the commandline version of SUMO.")
+    opt_parser.add_option("--multiTrain", action="store_true", default=False, 
+                          help="Run the simulation with a chosen the number of trains.")
+    opt_parser.add_option("--setParam", action="store_true", default=False, 
+                          help="Set the parameters of the simulation.")
     options, args = opt_parser.parse_args()
     return options
 
@@ -104,6 +109,26 @@ if __name__ == "__main__":
         sumoBinary = checkBinary('sumo')
     else:
         sumoBinary = checkBinary('sumo-gui')
+    if options.multiTrain:
+        print("\nHai scelto l'esecuzione con piu' treni")
+    if options.setParam:
+        print("\nSet the parameters of the simulation.")
+        print("Remember that the distance expressed in SUMO is 10 times greater than the real one. So, to enter a distance of 100 meters real you need to enter '10'.")
+        while True:
+            distCoupling = float(input("\nSet the distance of virtual coupling: "))
+            if(distCoupling < 5 or distCoupling > 40):
+                print("\nThe distance of virtual coupling must be between 5 and 40.")
+            else:
+                break
+        while True:
+            distDecoupling = float(input("\nSet the distance of virtual decoupling: "))
+            if(distDecoupling < 45 or distDecoupling > 150):
+                print("\nThe distance of virtual decoupling must be between 45 and 150.")
+            else:
+                break
+        print(distCoupling, distDecoupling)
+        
+
     traci.start([sumoBinary, "-c", "railvc.sumocfg", "--tripinfo-output", "tripinfo.xml"])
     run()
     if options.nogui:

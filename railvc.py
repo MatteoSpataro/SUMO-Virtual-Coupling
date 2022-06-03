@@ -111,21 +111,38 @@ if __name__ == "__main__":
         sumoBinary = checkBinary('sumo-gui')
     if options.multiTrain:
         print("\nHai scelto l'esecuzione con piu' treni")
+        while True:
+            nTrains = int(input("\nSet the number of the trains: "))
+            if (nTrains < 2 or nTrains > 10):
+                print("\nThe number of the trains must be between 2 and 10")
+            else:
+                break
+        print(nTrains)
+        
     if options.setParam:
         print("\nSet the parameters of the simulation.")
         print("Remember that the distance expressed in SUMO is 10 times greater than the real one. So, to enter a distance of 100 meters real you need to enter '10'.")
         while True:
             distCoupling = float(input("\nSet the distance of virtual coupling: "))
-            if(distCoupling < 5 or distCoupling > 40):
+            if (distCoupling < 5 or distCoupling > 40):
                 print("\nThe distance of virtual coupling must be between 5 and 40.")
             else:
                 break
         while True:
             distDecoupling = float(input("\nSet the distance of virtual decoupling: "))
-            if(distDecoupling < 45 or distDecoupling > 150):
+            if (distDecoupling < 45 or distDecoupling > 150):
                 print("\nThe distance of virtual decoupling must be between 45 and 150.")
             else:
                 break
+        if options.multiTrain:
+            for i in range(1, nTrains):
+                loop = True
+                while True:
+                    trainSpeed = float(input("\nSet the speed of the Train ", i, ": "))
+                    if (trainSpeed < 10 or trainSpeed > 30):
+                        print("\nThe speed of the train must be between 10 and 30.")
+                    else:
+                        loop = False
         print(distCoupling, distDecoupling)
         
 

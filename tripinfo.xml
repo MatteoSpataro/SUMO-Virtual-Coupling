@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2022-06-03 16:58:09 by Eclipse SUMO GUI Version 1.13.0
+<!-- generated on 2022-06-07 12:09:40 by Eclipse SUMO GUI Version 1.13.0
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
 
     <input>
-        <net-file value="railvc.net.xml"/>
-        <route-files value="railvc.rou.xml"/>
-        <additional-files value="railvc.add.xml"/>
+        <net-file value="railvc2.net.xml"/>
+        <route-files value="railvc2.rou.xml"/>
+        <additional-files value="railvc2.add.xml"/>
     </input>
 
     <output>
@@ -14,11 +14,12 @@
     </output>
 
     <traci_server>
-        <remote-port value="60558"/>
+        <remote-port value="57395"/>
     </traci_server>
 
 </configuration>
 -->
 
 <tripinfos xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/tripinfo_file.xsd">
+    <tripinfo id="2" depart="0.00" departLane="E2_0" departPos="100.10" departSpeed="0.00" departDelay="0.00" arrival="100.00" arrivalLane="E21_0" arrivalPos="120.00" arrivalSpeed="20.00" duration="100.00" routeLength="1991.86" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="32.43" rerouteNo="1" devices="tripinfo_2" vType="rail2" speedFactor="1.00" vaporized=""/>
 </tripinfos>

@@ -3,8 +3,10 @@ import sys
 import optparse
 
 DISTANCE_COUPLING = 10
-DISTANCE_DECOUPLING = 10
+DISTANCE_DECOUPLING = 100
 DEFAULT_SPEED = 20
+TRAINS = 2
+trainSpeed = [20.0]
 
 if 'SUMO_HOME' in os.environ:
     tools = os.path.join(os.environ['SUMO_HOME'], 'tools')
@@ -108,6 +110,22 @@ def run():
     traci.close()
     sys.stdout.flush()
 
+def setSpeeds():
+    print("\nThe speed of the train must be between 10.0 and 30.0 (100 Km/h - 300 Km/h).")
+    trainSpeed.clear()
+    for i in range(1, TRAINS+1):
+        loop = True
+        while loop:
+            print("\nSet the speed of the Train ", i)
+            speed = float(input(": "))
+            if (speed < 10.0 or speed > 30.0):
+                print("\nThe speed of the train must be between 10.0 and 30.0.")
+            else:
+                trainSpeed.append(speed);
+                loop = False
+    for train_speed in trainSpeed: 
+        print("\n", train_speed)
+
 if __name__ == "__main__":
     options = get_options()
     if options.nogui:
@@ -115,40 +133,34 @@ if __name__ == "__main__":
     else:
         sumoBinary = checkBinary('sumo-gui')
     if options.multiTrain:
-        print("\nHai scelto l'esecuzione con piu' treni")
         while True:
-            nTrains = int(input("\nSet the number of the trains: "))
+            nTrains = int(input("\nSet the number of trains: "))
             if (nTrains < 2 or nTrains > 10):
-                print("\nThe number of the trains must be between 2 and 10")
+                print("\nThe number of trains must be between 2 and 10")
             else:
+                TRAINS = nTrains
                 break
-        print(nTrains)
-        
+        answer = input("\n\nDo you want change the default speed of the trains? (Y, N) ")
+        if answer == 'Y' or answer == 'y':
+            setSpeeds()        
     if options.setParam:
         print("\nSet the parameters of the simulation.")
-        print("Remember that the distance expressed in SUMO is 10 times greater than the real one. So, to enter a distance of 100 meters real you need to enter '10'.")
+        print("\nRemember that the distance expressed in SUMO is 10 times greater than the real one: to set a distance of 100 meters real you need to enter '10'.")
         while True:
-            distCoupling = float(input("\nSet the distance of virtual coupling: "))
+            distCoupling = float(input("\nSet the distance of virtual coupling (default = 10): "))
             if (distCoupling < 5 or distCoupling > 40):
                 print("\nThe distance of virtual coupling must be between 5 and 40.")
             else:
+                DISTANCE_COUPLING = distCoupling
                 break
         while True:
-            distDecoupling = float(input("\nSet the distance of virtual decoupling: "))
+            distDecoupling = float(input("\nSet the distance of virtual decoupling (default = 100): "))
             if (distDecoupling < 45 or distDecoupling > 150):
                 print("\nThe distance of virtual decoupling must be between 45 and 150.")
             else:
+                DISTANCE_DECOUPLING = distDecoupling
                 break
-        if options.multiTrain:
-            for i in range(1, nTrains):
-                loop = True
-                while True:
-                    trainSpeed = float(input("\nSet the speed of the Train ", i, ": "))
-                    if (trainSpeed < 10 or trainSpeed > 30):
-                        print("\nThe speed of the train must be between 10 and 30.")
-                    else:
-                        loop = False
-        print(distCoupling, distDecoupling)
+        setSpeeds()
         
 
     traci.start([sumoBinary, "-c", "railvc.sumocfg", "--tripinfo-output", "tripinfo.xml"])

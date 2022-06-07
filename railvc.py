@@ -2,6 +2,10 @@ import os
 import sys
 import optparse
 
+DISTANCE_COUPLING = 10
+DISTANCE_DECOUPLING = 10
+DEFAULT_SPEED = 20
+
 if 'SUMO_HOME' in os.environ:
     tools = os.path.join(os.environ['SUMO_HOME'], 'tools')
     sys.path.append(tools)
@@ -23,14 +27,14 @@ def get_options():
     return options
 
 def stepDecoupling(distance):
-    if distance < 100:    
+    if distance < DISTANCE_DECOUPLING:    
         speedT2 = traci.vehicle.getSpeed("2")
         traci.vehicle.setSpeed("2", speedT2-1)
         print("\nTrain 1: ", traci.vehicle.getSpeed("1"))
         print("\nTrain 2: ", traci.vehicle.getSpeed("2"))
         print("\n\nTrain 2: decreasing speed\n")
     else:
-        traci.vehicle.setSpeed("2", 20)
+        traci.vehicle.setSpeed("2", DEFAULT_SPEED)
         print("\nSpeed Train 1: ", traci.vehicle.getSpeed("1"))
         print("\nSpeed Train 2: ", traci.vehicle.getSpeed("2"))
         print("\n\nDECOUPLING COMPLETED\n")
@@ -40,18 +44,19 @@ def stepDecoupling(distance):
 def stepCoupling(distance):
     oldSpeedT1 = traci.vehicle.getSpeed("1")
     oldSpeedT2 = traci.vehicle.getSpeed("2")
-    if distance >= 50: #Distance bigger than 500m
+    if distance >= DISTANCE_COUPLING*5: #Distance bigger than 500m
         print("\nTrain 1: ", traci.vehicle.getSpeed("1"))
         print("\nTrain 2: ", traci.vehicle.getSpeed("2"))
         print("\nTrain 2: increasing speed\n")
-        if oldSpeedT2 <= 29 and (oldSpeedT2-oldSpeedT1)<6: #Speed must be under 300 km/h
+        speedDiff = oldSpeedT2 - oldSpeedT1
+        if oldSpeedT2 <= 29 and speedDiff < 6: #Speed must be under 300 km/h
             traci.vehicle.setSpeed("2", oldSpeedT2+1)
-    elif distance > 10: #Distance between 100m and 500m
-        if oldSpeedT2 > oldSpeedT1+5:
+    elif distance > DISTANCE_COUPLING: #Distance between 100m and 500m
+        if oldSpeedT2 > oldSpeedT1 + 5:
             traci.vehicle.setSpeed("2", oldSpeedT2-5)
-        elif oldSpeedT2 > oldSpeedT1+2.5:
+        elif oldSpeedT2 > oldSpeedT1 + 2.5:
             traci.vehicle.setSpeed("2", oldSpeedT2-2.5)
-        elif oldSpeedT2 > oldSpeedT1+1.5:
+        elif oldSpeedT2 > oldSpeedT1 + 1.5:
             traci.vehicle.setSpeed("2", oldSpeedT2-0.5)
         print("\nTrain 1: ", traci.vehicle.getSpeed("1"))
         print("\nTrain 2: ", traci.vehicle.getSpeed("2"))
@@ -69,8 +74,8 @@ def run():
     traci.simulationStep()
     step = 1
     #Set the speeds
-    traci.vehicle.setSpeed("1", 20.8)
-    traci.vehicle.setSpeed("2", 20)
+    traci.vehicle.setSpeed("1", DEFAULT_SPEED + 0.8)
+    traci.vehicle.setSpeed("2", DEFAULT_SPEED)
     #Delete the limit on the distance between vehicles imposed by SUMO
     traci.vehicle.setSpeedMode("2", 28)
     while traci.simulation.getMinExpectedNumber() > 0:

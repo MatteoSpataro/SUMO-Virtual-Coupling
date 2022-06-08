@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2022-06-08 10:10:07 by Eclipse SUMO GUI Version 1.13.0
+<!-- generated on 2022-06-08 16:24:34 by Eclipse SUMO GUI Version 1.13.0
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
 
     <input>
@@ -14,14 +14,13 @@
     </output>
 
     <traci_server>
-        <remote-port value="51421"/>
+        <remote-port value="59758"/>
     </traci_server>
 
 </configuration>
 -->
 
 <tripinfos xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/tripinfo_file.xsd">
-</tripinfos>
-id="1" depart="0.00" departLane="E2_0" departPos="120.10" departSpeed="0.00" departDelay="0.00" arrival="484.00" arrivalLane="E3_0" arrivalPos="194.50" arrivalSpeed="20.80" duration="484.00" routeLength="9667.97" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="161.28" rerouteNo="7" devices="tripinfo_1" vType="rail1" speedFactor="1.00" vaporized=""/>
-    <tripinfo id="2" depart="0.00" departLane="E1_0" departPos="100.10" departSpeed="0.00" departDelay="0.00" arrival="637.00" arrivalLane="E4_0" arrivalPos="121.12" arrivalSpeed="20.80" duration="637.00" routeLength="12952.21" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="204.73" rerouteNo="8" devices="tripinfo_2" vType="rail2@2" speedFactor="1.00" vaporized=""/>
+    <tripinfo id="1" depart="0.00" departLane="E2_0" departPos="120.10" departSpeed="0.00" departDelay="0.00" arrival="422.00" arrivalLane="E17_0" arrivalPos="84.29" arrivalSpeed="13.00" duration="422.00" routeLength="5361.07" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="242.89" rerouteNo="5" devices="tripinfo_1" vType="rail1" speedFactor="1.00" vaporized=""/>
+    <tripinfo id="2" depart="0.00" departLane="E1_0" departPos="100.10" departSpeed="0.00" departDelay="0.00" arrival="574.00" arrivalLane="E4_0" arrivalPos="121.12" arrivalSpeed="9.20" duration="574.00" routeLength="6888.83" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="344.07" rerouteNo="4" devices="tripinfo_2" vType="rail2" speedFactor="1.00" vaporized=""/>
 </tripinfos>

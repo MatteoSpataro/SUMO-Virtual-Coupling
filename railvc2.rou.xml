@@ -3,9 +3,9 @@
 	<vType id="rail2" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="1,0,0"/>
 	<vType id="rail3" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="0,1,0"/>
 	
-	<route id="route1" edges="E1 E4"/>
-	<route id="route2" edges="E2 E6"/>
-	<route id="route3" edges="E3 E5"/>
+	<route id="route1" edges="E2 E4 E5 E6 E7"/>
+	<route id="route2" edges="E1 E2 E4 E5 E6 E7"/>
+	<route id="route3" edges="E18 E19 E20 E1 E2 E4 E5 E6 E7"/>
 	
 	<vehicle id="1" type="rail1" route="route1" depart="0" />
 	<vehicle id="2" type="rail2" route="route2" depart="0" />

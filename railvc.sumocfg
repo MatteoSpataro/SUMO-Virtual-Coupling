@@ -1,7 +1,7 @@
 <configuration>
 	<input>
-		<net-file value="railvc2.net.xml"/>
-		<route-files value="railvc2.rou.xml"/>
-		<additional-files value="railvc2.add.xml"/>
+		<net-file value="railvc.net.xml"/>
+		<route-files value="railvc.rou.xml"/>
+		<additional-files value="railvc.add.xml"/>
 	</input>
 </configuration>

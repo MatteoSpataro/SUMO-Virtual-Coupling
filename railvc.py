@@ -74,12 +74,16 @@ def run():
     coupling = False #They are trying to reach the coupling if is "False"
     decoupling = False #They are trying to reach the decoupling if is "True"
     traci.simulationStep()
-    step = 1
+    step = 1 #step of the simulation
     #Set the speeds
-    traci.vehicle.setSpeed("1", DEFAULT_SPEED + 0.8)
-    traci.vehicle.setSpeed("2", DEFAULT_SPEED)
+    pos = 1
+    for speed in trainSpeed:
+        traci.vehicle.setSpeed(str(pos), speed)
+        pos+=1
     #Delete the limit on the distance between vehicles imposed by SUMO
-    traci.vehicle.setSpeedMode("2", 28)
+    for i in (2, TRAINS):
+        traci.vehicle.setSpeedMode(str(i), 28)
+    #Start the run of the trains
     while traci.simulation.getMinExpectedNumber() > 0:
         print("\n---Step ", step)
         if len(traci.vehicle.getIDList()) > 1:
@@ -110,7 +114,7 @@ def run():
     traci.close()
     sys.stdout.flush()
 
-def setSpeeds():
+def changeSpeeds():
     print("\nThe speed of the train must be between 10.0 and 30.0 (100 Km/h - 300 Km/h).")
     trainSpeed.clear()
     for i in range(1, TRAINS+1):
@@ -123,8 +127,7 @@ def setSpeeds():
             else:
                 trainSpeed.append(speed);
                 loop = False
-    for train_speed in trainSpeed: 
-        print("\n", train_speed)
+    
 
 if __name__ == "__main__":
     options = get_options()
@@ -142,7 +145,7 @@ if __name__ == "__main__":
                 break
         answer = input("\n\nDo you want change the default speed of the trains? (Y, N) ")
         if answer == 'Y' or answer == 'y':
-            setSpeeds()        
+            changeSpeeds()        
     if options.setParam:
         print("\nSet the parameters of the simulation.")
         print("\nRemember that the distance expressed in SUMO is 10 times greater than the real one: to set a distance of 100 meters real you need to enter '10'.")

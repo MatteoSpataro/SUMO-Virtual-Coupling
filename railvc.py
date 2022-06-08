@@ -163,7 +163,7 @@ if __name__ == "__main__":
             else:
                 DISTANCE_DECOUPLING = distDecoupling
                 break
-        setSpeeds()
+        changeSpeeds()
         
 
     traci.start([sumoBinary, "-c", "railvc.sumocfg", "--tripinfo-output", "tripinfo.xml"])

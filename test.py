@@ -1,2 +1,2 @@
-for i in range(0,2):
-    print("ciao")
+for i in range(2,2):
+    print(i)

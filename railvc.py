@@ -14,7 +14,7 @@ MAX_SPEED = 30.0
 trainList = [["1",20.8],["2",20]] #List of active trains
 distances = [] #List with the distances between trains
 oldSpeed = [] #List with the speeds of the trains in the previous step
-couplingTrain = [False] #Train is trying to reach the coupling if is "True"
+couplingTrain = [True] #Train is trying to reach the coupling if is "True"
 decouplingTrain = [False] #Train is trying to reach the decoupling if is "True"
 state = ["decoupled"]
 isBraking = [False]
@@ -41,24 +41,26 @@ def get_options():
 
 def stepDecoupling(idTrain):
     if distances[idTrain-1] < DISTANCE_DECOUPLING:    
-        speedT2 = traci.vehicle.getSpeed(str(idTrain+1))
-        traci.vehicle.setSpeed(str(idTrain+1), speedT2-1)
-        print("\nIn decoupling, Train ", idTrain+1, "is decreasing speed\n")
+        trainFollowerSpeed = traci.vehicle.getSpeed(str(idTrain+1))
+        traci.vehicle.setSpeed(str(idTrain+1), trainFollowerSpeed - 1)
+        print("\nIn decoupling, Train ", idTrain+1, "is decreasing speed")
         
         #Decrease the speed of all the trains coupled with the follower train
         for idFollower in range(idTrain+1,len(trainList)):
             if state[idFollower-1].__eq__("coupled"):
-                traci.vehicle.setSpeed(str(idFollower+1), speedT2-1)
-                print("\nIn decoupling, Train ", idFollower+1, "is decreasing speed\n")
+                traci.vehicle.setSpeed(str(idFollower+1), trainFollowerSpeed - 1)
+                print("\nIn decoupling, Train ", idFollower+1, "is decreasing speed")
     else:
+        #The trains are decoupled
         traci.vehicle.setSpeed(str(idTrain+1), DEFAULT_SPEED)
-        print("\n\nDECOUPLING COMPLETED BETWEEN T", idTrain, " AND T", idTrain+1, "\n")
-        state[idTrain-1] = "decoupled"
-        #Set the speed of all the trains coupled with the follower train
+        #Reset the speed of all the trains coupled with the follower train
         for idFollower in range(idTrain+1,len(trainList)):
             if state[idFollower-1].__eq__("coupled"):
                 traci.vehicle.setSpeed(str(idFollower+1), DEFAULT_SPEED)
-                print("\nIn decoupling, Train ", idFollower+1, "is increasing speed\n")
+                print("\nIn decoupling, Train ", idFollower+1, "reset the speed")
+
+        print("\n\nDECOUPLING COMPLETED BETWEEN T", idTrain, " AND T", idTrain+1, "\n")
+        state[idTrain-1] = "decoupled"
         return False
     return True
 
@@ -73,30 +75,40 @@ def trainAheadDecoupling(idTrain):
     return False
 
 def stepCoupling(idTrain):
-    speedT1 = traci.vehicle.getSpeed(str(idTrain))
-    speedT2 = traci.vehicle.getSpeed(str(idTrain+1))
-    speedDiff = speedT2 - speedT1
-    
-    if trainAheadDecoupling(idTrain):
-        if state[idTrain-1].__eq__("coupled"):
-            return False
-        else:
+    trainSpeed = traci.vehicle.getSpeed(str(idTrain))
+    trainFollowerSpeed = traci.vehicle.getSpeed(str(idTrain+1))
+    speedDiff = trainFollowerSpeed - trainSpeed
+
+    if state[idTrain-1].__eq__("almost_coupled"):
+        if distances[idTrain-1] > DISTANCE_COUPLING:
+            traci.vehicle.setSpeed(str(idTrain+1), trainFollowerSpeed+1)
+            print("\nTrains T", idTrain, " and T", idTrain+1, "are almost coupled\n")
             return True
+        else:
+            traci.vehicle.setSpeed(str(idTrain+1), trainSpeed)
+            traci.vehicle.setSpeedFactor(str(idTrain+1), traci.vehicle.getSpeedFactor(str(idTrain)))
+            traci.vehicle.setAccel(str(idTrain+1), traci.vehicle.getAccel(str(idTrain)))
+            state[idTrain-1] = "coupled"
+            return False
     if distances[idTrain-1] >= DISTANCE_COUPLING*5.50:
-        print("\nTrain ", idTrain+1, ": increasing speed\n")
-        if speedT2 <= 29 and speedDiff < 6: #Speed must be under 300 km/h
-            traci.vehicle.setSpeed(str(idTrain+1), speedT2+1)
+        if trainFollowerSpeed <= MAX_SPEED-1 and speedDiff < 6:
+            traci.vehicle.setSpeed(str(idTrain+1), trainFollowerSpeed+1)
+            print("\nTrain", idTrain+1, ": increasing speed\n")
     elif distances[idTrain-1] > DISTANCE_COUPLING: 
         if speedDiff > 5:
-            traci.vehicle.setSpeed(str(idTrain+1), speedT2-5)
+            traci.vehicle.setSpeed(str(idTrain+1), trainFollowerSpeed-5)
+            traci.vehicle.setDecel(str(idTrain+1), 
+                                   traci.vehicle.getDecel(str(idTrain+1))+0.2)
+            print("\nIn coupling, Train", idTrain+1, "is decreasing his speed")
         elif speedDiff > 2.5:
-            traci.vehicle.setSpeed(str(idTrain+1), speedT2-2.5)
+            traci.vehicle.setSpeed(str(idTrain+1), trainFollowerSpeed-2.5)
+            print("\nIn coupling, Train", idTrain+1, "is decreasing his speed")
         elif speedDiff > 1.5:
-            traci.vehicle.setSpeed(str(idTrain+1), speedT2-1)
-        print("\nIn coupling, Train ", idTrain+1, ": decreasing speed\n")
+            traci.vehicle.setSpeed(str(idTrain+1), trainFollowerSpeed-1.2)
+            print("\nIn coupling, Train", idTrain+1, "is decreasing his speed")
     elif distances[idTrain-1] > 0:
         print("\n\nCOUPLING COMPLETED BETWEEN T", idTrain, " AND T", idTrain+1, "\n")
-        traci.vehicle.setSpeed(str(idTrain+1), speedT1)
+        traci.vehicle.setSpeed(str(idTrain+1), trainSpeed)
         traci.vehicle.setSpeedFactor(str(idTrain+1), traci.vehicle.getSpeedFactor(str(idTrain)))
         traci.vehicle.setAccel(str(idTrain+1), traci.vehicle.getAccel(str(idTrain)))
         state[idTrain-1] = "coupled"
@@ -105,25 +117,30 @@ def stepCoupling(idTrain):
 
 #Hold the current state of the trains
 def stepHoldState(idTrain):
-    speedT1 = traci.vehicle.getSpeed(str(idTrain))
+    trainSpeed = traci.vehicle.getSpeed(str(idTrain))
     speedT2 = traci.vehicle.getSpeed(str(idTrain+1))
     if trainAheadDecoupling(idTrain):
         return
-    if (oldSpeed[idTrain-1] - speedT1) > 0:
-        #the train ahead is decreasing his speed.
-        traci.vehicle.setSpeed(str(idTrain+1), speedT2-8)
-        print("\nThe train ahead is decreasing his speed.")
-        isBraking[idTrain-1] = True
-        return
-    elif distances[idTrain-1] < (DISTANCE_COUPLING/2 + 1):
+    if oldSpeed[idTrain-1] > trainSpeed:
+        #the train ahead is decreasing his speed
+        if state[idTrain-1].__eq__("coupled") or state[idTrain-1].__eq__("almost_coupled"):
+            traci.vehicle.setSpeed(str(idTrain+1), speedT2-8)
+            print("\nThe train ahead is decreasing his speed.")
+            isBraking[idTrain-1] = True
+            return
+    if distances[idTrain-1] < (DISTANCE_COUPLING/2.0 + 1):
         traci.vehicle.setSpeed(str(idTrain+1), speedT2-0.8)
         return
-    elif isBraking[idTrain-1] == True:
-        isBraking[idTrain-1] = False #The train ahead is no more braking
+    if isBraking[idTrain-1] == True:
+        #The train ahead is no more braking
+        isBraking[idTrain-1] = False 
         if state[idTrain-1].__eq__("coupled"):
             couplingTrain[idTrain-1] = True #The trains must retrieve their coupling
             state[idTrain-1].__eq__("almost_coupled")
-    traci.vehicle.setSpeed(str(idTrain+1), speedT1)
+            traci.vehicle.setSpeed(str(idTrain+1), trainSpeed+1)
+            print("\nTrains T", idTrain, " and T", idTrain+1, "retrieve their coupling\n")
+            return
+    traci.vehicle.setSpeed(str(idTrain+1), trainSpeed)
     traci.vehicle.setSpeedFactor(str(idTrain+1), traci.vehicle.getSpeedFactor(str(idTrain)))
     traci.vehicle.setAccel(str(idTrain+1), traci.vehicle.getAccel(str(idTrain)))
 
@@ -132,12 +149,8 @@ def printDistances():
     for idTrain in range(1,len(trainList)):
         print("\n---T", idTrain, " and T", idTrain+1, ": ", distances[idTrain-1], "m")
 
-def setCouplingDecoupling():
-    couplingTrain.clear()
-    decouplingTrain.clear()
-    isBraking.clear()
-    state.clear()
-    for train in range(1, len(trainList)):
+def setInitialParameters():
+    for train in range(2, len(trainList)):
         couplingTrain.append(True)
         decouplingTrain.append(False)
         isBraking.append(False)
@@ -146,11 +159,12 @@ def setCouplingDecoupling():
 def printAllSpeed():
     print("\nSpeeds:")
     for train in trainList:
-        print("\nTrain", train[0], ": ", traci.vehicle.getSpeed(str(train[0])))
+        print("\nTrain", train[0], ": ", train[1])
 
 def updateOldSpeed():
-    for idTrain in range(1, len(trainList)):
-        oldSpeed[idTrain-1] = traci.vehicle.getSpeed(str(idTrain))
+    oldSpeed.clear()
+    for train in trainList:
+        oldSpeed.append(train[1])
 
 #Updates the list of active trains
 def updateTrainsActive():
@@ -160,13 +174,13 @@ def updateTrainsActive():
         for id in idTrains:
             if train[0].__eq__(id):
                 thereis = True
+                train[1] = traci.vehicle.getSpeed(train[0])
         if thereis == False:
             trainList.remove(train)
-            
 
 def run():
     traci.simulationStep()
-    setCouplingDecoupling()
+    setInitialParameters()
     step = 1 #step of the simulation
     
     #Set the previous speeds to zero

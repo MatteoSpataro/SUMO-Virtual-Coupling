@@ -212,6 +212,8 @@ def run():
                 print("\nSet change of direction for Train 1")
                 traci.vehicle.changeTarget("1", "E3")
                 decouplingTrain[0] = True
+            if step == 372:
+                traci.vehicle.setSpeed("1", 26)
             
             for idTrain in range(1,len(trainList)):
                 #Look if there are trains in decoupling mode
@@ -221,7 +223,8 @@ def run():
                 elif couplingTrain[idTrain-1] == True:
                     couplingTrain[idTrain-1] = stepCoupling(idTrain)
                 else:
-                    stepHoldState(idTrain)
+                    if not state[idTrain-1].__eq__("decoupled"):
+                        stepHoldState(idTrain)
             printAllSpeed()
             updateOldSpeed()
         traci.simulationStep()

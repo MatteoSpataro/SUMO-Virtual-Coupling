@@ -232,10 +232,15 @@ def run():
                     traci.vehicle.setSpeedMode(str(idTrain+1), 30)
             
             if step == 200: 
-                print("Set change of direction for Train 1")
-                traci.vehicle.changeTarget("1", "E3")
+                print("\nSet change of direction for Train 1")
+                traci.vehicle.changeTarget("1", "E31")
                 decouplingTrain[0] = True
             
+            if step == 220: 
+                print("\nSet change of direction for Train 2")
+                traci.vehicle.changeTarget("2", "E35")
+                decouplingTrain[1] = True
+
             i = 0
             for train in trainList:
                 if i == len(trainList)-1:

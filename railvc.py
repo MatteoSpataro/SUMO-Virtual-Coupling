@@ -71,7 +71,8 @@ def stepDecoupling(pos):
         trainFollowerSpeed = traci.vehicle.getSpeed(trainFollower[0])
         traci.vehicle.setSpeed(trainFollower[0], trainFollowerSpeed - 1)
         print("\nIn decoupling, Train ", trainFollower[0], "is decreasing speed")
-        
+        state[pos] = "almost_decoupled"
+
         #Decrease the speed of all the trains coupled with the follower train
         for idFollower in range(int(trainFollower[0]),len(trainList)):
             if state[idFollower-1].__eq__("coupled") or state[idFollower-1].__eq__("almost_coupled"):
@@ -93,11 +94,13 @@ def stepDecoupling(pos):
 #Check if the train ahead is decoupling: in this case we can't modify the speed of the following trains 
 #in order not to overwrite the changes made during the decoupling phase of the train ahead.
 def trainAheadDecoupling(idTrain):
-    firstTrain = trainList[0]
-    if firstTrain[0].__eq__(idTrain):
-        return False
-    if decouplingTrain[int(idTrain)-2] == True:
-        return True
+    while idTrain > 0:
+        if decouplingTrain[idTrain-1] == True:
+            return True
+        elif state[idTrain-1].__eq__("coupled") or state[idTrain-1].__eq__("almost_coupled"):
+            return trainAheadDecoupling(idTrain-1)
+        else:
+            return False
     return False
 
 def stepCoupling(pos):
@@ -141,7 +144,7 @@ def stepHoldState(pos):
     trainFollower = trainList[pos+1]
     trainSpeed = traci.vehicle.getSpeed(trainAhead[0])
     speedT2 = traci.vehicle.getSpeed(trainFollower[0])
-    if trainAheadDecoupling(trainAhead[0]):
+    if trainAheadDecoupling(pos+1):
         return
     if oldSpeed[pos] > trainSpeed:
         #the train ahead is decreasing his speed

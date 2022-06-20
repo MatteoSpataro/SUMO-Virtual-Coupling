@@ -13,8 +13,8 @@
 	
 	<vType id="rail4" priority="1" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="1,1,0"/>
 	<vehicle id="4" type="rail4" route="route3" depart="19" />
-	<!--
+	
 	<vType id="rail5" priority="1" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="1,1,1"/>
 	<vehicle id="5" type="rail5" route="route3" depart="39" />
-	-->
+	<!---->
 </routes>

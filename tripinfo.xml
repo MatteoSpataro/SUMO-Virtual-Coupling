@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2022-06-21 13:00:42 by Eclipse SUMO GUI Version 1.13.0
+<!-- generated on 2022-06-21 16:28:58 by Eclipse SUMO GUI Version 1.13.0
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
 
     <input>
@@ -14,7 +14,7 @@
     </output>
 
     <traci_server>
-        <remote-port value="53308"/>
+        <remote-port value="58676"/>
     </traci_server>
 
 </configuration>
@@ -24,4 +24,11 @@
     <tripinfo id="1" depart="0.00" departLane="E1_0" departPos="100.10" departSpeed="0.00" departDelay="0.00" arrival="211.00" arrivalLane="E35_0" arrivalPos="120.00" arrivalSpeed="20.80" duration="211.00" routeLength="3813.38" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="67.03" rerouteNo="3" devices="tripinfo_1" vType="rail1" speedFactor="1.00" vaporized=""/>
     <tripinfo id="2" depart="0.00" departLane="E2_0" departPos="100.10" departSpeed="0.00" departDelay="0.00" arrival="226.00" arrivalLane="E35_0" arrivalPos="120.00" arrivalSpeed="20.00" duration="226.00" routeLength="3839.75" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="72.98" rerouteNo="3" devices="tripinfo_2" vType="rail2@2" speedFactor="1.00" vaporized=""/>
     <tripinfo id="3" depart="0.00" departLane="E3_0" departPos="100.10" departSpeed="0.00" departDelay="0.00" arrival="495.00" arrivalLane="E35_0" arrivalPos="120.00" arrivalSpeed="18.40" duration="495.00" routeLength="8462.97" waitingTime="9.00" waitingCount="1" stopTime="0.00" timeLoss="179.83" rerouteNo="4" devices="tripinfo_3" vType="rail3@3" speedFactor="1.00" vaporized=""/>
+    <tripinfo id="4" depart="24.00" departLane="E3_0" departPos="100.10" departSpeed="0.00" departDelay="0.00" arrival="765.00" arrivalLane="E37_0" arrivalPos="105.79" arrivalSpeed="18.40" duration="741.00" routeLength="13146.56" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="266.17" rerouteNo="5" devices="tripinfo_4" vType="rail4@4" speedFactor="1.00" vaporized=""/>
+    <tripinfo id="5" depart="49.00" departLane="E3_0" departPos="100.10" departSpeed="0.00" departDelay="0.00" arrival="771.00" arrivalLane="E37_0" arrivalPos="105.79" arrivalSpeed="18.40" duration="722.00" routeLength="13146.56" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="247.43" rerouteNo="5" devices="tripinfo_5" vType="rail5@5" speedFactor="1.00" vaporized=""/>
+    <tripinfo id="6" depart="74.00" departLane="E3_0" departPos="100.10" departSpeed="0.00" departDelay="0.00" arrival="778.00" arrivalLane="E37_0" arrivalPos="105.79" arrivalSpeed="18.40" duration="704.00" routeLength="13146.56" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="229.00" rerouteNo="5" devices="tripinfo_6" vType="rail6@6" speedFactor="1.00" vaporized=""/>
+    <tripinfo id="7" depart="99.00" departLane="E3_0" departPos="100.10" departSpeed="0.00" departDelay="0.00" arrival="784.00" arrivalLane="E37_0" arrivalPos="105.79" arrivalSpeed="18.40" duration="685.00" routeLength="13146.56" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="210.26" rerouteNo="5" devices="tripinfo_7" vType="rail7@7" speedFactor="1.00" vaporized=""/>
+    <tripinfo id="8" depart="124.00" departLane="E3_0" departPos="100.10" departSpeed="0.00" departDelay="0.00" arrival="790.00" arrivalLane="E37_0" arrivalPos="105.79" arrivalSpeed="18.40" duration="666.00" routeLength="13146.56" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="191.46" rerouteNo="5" devices="tripinfo_8" vType="rail8@8" speedFactor="1.00" vaporized=""/>
+    <tripinfo id="9" depart="149.00" departLane="E3_0" departPos="100.10" departSpeed="0.00" departDelay="0.00" arrival="797.00" arrivalLane="E37_0" arrivalPos="105.79" arrivalSpeed="18.40" duration="648.00" routeLength="13146.56" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="172.87" rerouteNo="5" devices="tripinfo_9" vType="rail9@9" speedFactor="1.00" vaporized=""/>
+    <tripinfo id="10" depart="174.00" departLane="E3_0" departPos="100.10" departSpeed="0.00" departDelay="0.00" arrival="803.00" arrivalLane="E37_0" arrivalPos="105.79" arrivalSpeed="18.40" duration="629.00" routeLength="13146.56" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="154.13" rerouteNo="5" devices="tripinfo_10" vType="rail10@10" speedFactor="1.00" vaporized=""/>
 </tripinfos>

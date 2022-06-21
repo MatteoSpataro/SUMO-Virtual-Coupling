@@ -21,6 +21,7 @@ state = ["decoupled"]
 isBraking = [False]
 incomingTrains = 0
 defaultSpeeds = [20.8, 20]
+countDisconnection = [0] #the number of sequential disconnection for each train
 
 if 'SUMO_HOME' in os.environ:
     tools = os.path.join(os.environ['SUMO_HOME'], 'tools')
@@ -49,6 +50,7 @@ def setInitialParameters():
         isBraking.append(False)
         state.append("decoupled")
         defaultSpeeds.append(trainList[train][1])
+        countDisconnection.append(0)
 
 def printAllSpeed():
     print("\nSpeeds:")
@@ -76,13 +78,6 @@ def stepDecoupling(pos):
         state[pos] = "almost_decoupled"
 
         #Decrease the speed of all the trains coupled with the follower train
-        """
-        for idFollower in range(int(trainFollower[0]),len(trainList)):
-            if state[idFollower-1].__eq__("coupled") or state[idFollower-1].__eq__("almost_coupled"):
-                traci.vehicle.setSpeed(str(idFollower+1), trainFollowerSpeed - 2)
-                print("\nIn decoupling, Train", idFollower+1, "is decreasing speed")
-        """
-        
         i = 1
         for train in trainList:
             if (int(train[0]) >= int(trainFollower[0])) and (i < len(trainList)): 
@@ -127,15 +122,20 @@ def stepCoupling(pos):
     if traci.vehicle.getRoadID(trainFollower[0]).__eq__("E3") or traci.vehicle.getRoadID(trainFollower[0]).__eq__("E5"):
         setSameSpeedFactores(trainFollower[0], trainAhead[0])
         return True
-    if distances[pos] == -1 and (not traci.vehicle.getRoadID(trainFollower[0]).__eq__("E2")):
-        traci.vehicle.setSpeed(trainFollower[0], trainFollowerSpeed-1)
-        traci.vehicle.setDecel(trainFollower[0], 
+    #Check if there is a connection problem
+    if distances[pos] == -1 and (not traci.vehicle.getRoadID(trainFollower[0]).__eq__("E2")): 
+        if countDisconnection[pos] < 6:
+            traci.vehicle.setSpeed(trainFollower[0], trainFollowerSpeed-1)
+            traci.vehicle.setDecel(trainFollower[0], 
                                    traci.vehicle.getDecel(trainFollower[0])+0.02)
+            countDisconnection[pos] += 1
+        else:
+            traci.vehicle.setSpeed(trainFollower[0], defaultSpeeds[pos])
+            traci.vehicle.setDecel(trainFollower[0], 0.7)
         return True
+    countDisconnection[pos] = 0
     if state[pos].__eq__("almost_coupled"):
-        if distances[pos] > DISTANCE_COUPLING:
-            traci.vehicle.setSpeed(trainFollower[0], trainFollowerSpeed+0.5)
-            print("\nTrains T", trainAhead[0], " and T", trainFollower[0], "are almost coupled\n")
+        print("\nTrains T", trainAhead[0], " and T", trainFollower[0], "are almost coupled\n")
     if distances[pos] >= DISTANCE_COUPLING*5.50 and trainFollowerSpeed <= MAX_SPEED-1:
         if speedDiff < 6:
             traci.vehicle.setSpeed(trainFollower[0], trainFollowerSpeed+1)
@@ -191,6 +191,12 @@ def stepHoldState(pos):
     elif distances[pos] < (DISTANCE_COUPLING/2.0 + 1):
         traci.vehicle.setSpeed(trainFollower[0], speedT2-0.8)
         state[pos] = "almost_coupled"
+        couplingTrain[pos] = True #The trains must retrieve their coupling
+        return
+    elif distances[pos] > DISTANCE_COUPLING+1:
+        traci.vehicle.setSpeed(trainFollower[0], speedT2-0.8)
+        state[pos] = "almost_coupled"
+        couplingTrain[pos] = True #The trains must retrieve their coupling
         return
     traci.vehicle.setSpeed(trainFollower[0], trainSpeed)
     setSameSpeedFactores(trainFollower[0], trainAhead[0])
@@ -217,17 +223,19 @@ def updateTrainsActive():
             couplingTrain.pop(0)
             state.pop(0)
             isBraking.pop(0)
+            countDisconnection.pop(0)
 
 def addTrain():
-    speed = DEFAULT_SPEED - 0.8*(len(trainList)+1)
+    speed = DEFAULT_SPEED - 0.8*3
     trainList.append([str(len(trainList)+1), speed])
     traci.vehicle.setSpeed(str(len(trainList)), speed)
-    oldSpeed.append(0)
+    oldSpeed.append(0.0)
     couplingTrain.append(True)
     decouplingTrain.append(False)
     isBraking.append(False)
     state.append("decoupled")
     defaultSpeeds.append(speed)
+    countDisconnection.append(0)
     setSameSpeedFactores(str(len(trainList)), str(len(trainList)-1))
 
 def run():
@@ -255,7 +263,7 @@ def run():
             #Check if there is an incoming train
             global incomingTrains
             if incomingTrains > 0:
-                if step>19 and (step%20 == 0):
+                if step>24 and (step%25 == 0):
                     addTrain()
                     incomingTrains -= 1
                                
@@ -316,9 +324,8 @@ def run():
                 elif not state[i].__eq__("decoupled"):
                     stepHoldState(i)
                 
-                print("\nState",i+1,": ",state[i])
-                print("\nInCoupling",i+1,": ",couplingTrain[i])
-                print("\nInDecoupling",i+1,": ", decouplingTrain[i])
+                print("\n## State",i+1,":",state[i],"## InCoupling",i+1,":",couplingTrain[i],
+                      "## InDecoupling",i+1,":", decouplingTrain[i])
                 i += 1
             printAllSpeed()
         traci.simulationStep()
@@ -331,7 +338,8 @@ def run():
 def changeSpeeds():
     print("\nThe speed of the train must be between",
           MIN_SPEED,"and",MAX_SPEED,"(",MIN_SPEED*10,"Km/h -",MAX_SPEED*10,"Km/h).")
-    for i in range(i,len(trainList)):
+    defaultSpeeds.clear()
+    for i in range(0,len(trainList)):
         loop = True
         while loop:
             print("\nSet the speed of the Train", i+1)
@@ -339,9 +347,24 @@ def changeSpeeds():
             if (speed < MIN_SPEED) or (speed > MAX_SPEED):
                 print("\nThe speed of the train must be between",MIN_SPEED,"and",MAX_SPEED,".")
             else:
-                defaultSpeeds[i].append(speed);
+                defaultSpeeds.append(speed);
                 loop = False
-    
+
+def setFileRou():
+    with open('default.rou.xml', 'r') as rf:
+        with open('railvc2.rou.xml', 'w') as wf:
+            for line in rf:
+                wf.write(line)
+
+
+def addNewTrain(idTrain):
+    colors = ["0,0,1","1,0,0","0,1,0","0,1,1","1,1,0","1,0,1","0.5,0.2,0","0.4,0.3,1","1,0.3,0.25","0,0.55,0"]
+    with open('railvc2.rou.xml', 'a') as f:
+        line = "<vType id=\"rail"+str(idTrain)+"\" priority=\"1\" vClass=\"rail\" length=\"100\" accel=\"0.7\" decel=\"0.7\" sigma=\"1.0\" maxSpeed=\"30\" guiShape=\"rail\" color=\""+colors[idTrain-1]+"\"/>\n"
+        f.write(line)
+        depart = 24 + 25*(idTrain-4)
+        line = "<vehicle id=\""+str(idTrain)+"\" type=\"rail"+str(idTrain)+"\" route=\"route3\" depart=\""+str(depart)+"\" />\n"
+        f.write(line)
 
 if __name__ == "__main__":
     options = get_options()
@@ -352,8 +375,8 @@ if __name__ == "__main__":
     if options.multiTrain:
         while True:
             nTrains = int(input("\nSet the number of trains: "))
-            if (nTrains < 2 or nTrains > 10):
-                print("\nThe number of trains must be between 2 and 10")
+            if (nTrains < 3 or nTrains > 10):
+                print("\nThe number of trains must be between 3 and 10")
             else:
                 trainList.clear()
                 if nTrains > 3:
@@ -363,6 +386,11 @@ if __name__ == "__main__":
                 else:
                     for i in range(0,nTrains):
                         trainList.append([str(i+1), DEFAULT_SPEED - 0.8*(i+1)])
+                setFileRou()
+                for i in range(4,nTrains+1):
+                    addNewTrain(i)
+                with open('railvc2.rou.xml', 'a') as f:
+                    f.write('</routes>')
                 break
         answer = input("\n\nDo you want change the default speed of the trains? (Y, N) ")
         if answer == 'Y' or answer == 'y':

@@ -10,10 +10,3 @@
 	<vehicle id="1" type="rail1" route="route1" depart="0" />
 	<vehicle id="2" type="rail2" route="route2" depart="0" />
 	<vehicle id="3" type="rail3" route="route3" depart="0" />
-<vType id="rail4" priority="1" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="0,1,1"/>
-<vehicle id="4" type="rail4" route="route3" depart="24" />
-<vType id="rail5" priority="1" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="1,1,0"/>
-<vehicle id="5" type="rail5" route="route3" depart="49" />
-<vType id="rail6" priority="1" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="1,0,1"/>
-<vehicle id="6" type="rail6" route="route3" depart="74" />
-</routes>

@@ -1,16 +1,4 @@
 <additionals>
-    <rerouter id="rerouter 0" edges="E1" probability="1">
-	    <interval begin="0" end="600">
-		    <destProbReroute id="E31"/>
-		</interval>
-	</rerouter>
-	
-	<rerouter id="rerouter 1" edges="E2" probability="1">
-		<interval begin="0" end="600">
-		    <destProbReroute id="E35"/>
-		</interval>
-	</rerouter>
-
 	<rerouter id="rerouter 2" edges="E6" probability="1">
 		<interval begin="0" end="660">
 			<destProbReroute id="E37"/>

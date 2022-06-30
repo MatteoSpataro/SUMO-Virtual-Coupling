@@ -3,7 +3,7 @@ import os
 import sys
 import optparse
 
-from rbc import DEFAULT_SPEED, MAX_DIST_COUP, MAX_DIST_DECOUP, MAX_SPEED, MIN_DIST_DECOUP, MIN_SPEED, Rbc
+from rbc import MIN_DIST_COUP, MAX_DIST_COUP, MIN_DIST_DECOUP, MAX_DIST_DECOUP, MAX_SPEED, MIN_DIST_DECOUP, MIN_SPEED, Rbc
 
 from sumolib import checkBinary
 import traci
@@ -86,15 +86,15 @@ if __name__ == "__main__":
         print("\nRemember that the distance expressed in SUMO is 10 times greater than the real one: "+
               "to set a distance of 100 meters real you need to enter '10'.")
         while True:
-            distCoupling = float(input("\nSet the distance of virtual coupling (default = "+str(rbc.distanceCoupling)+"): "))
-            if (distCoupling < MAX_DIST_COUP) or (distCoupling > MAX_DIST_COUP):
-                print("\nThe distance of virtual coupling must be between ", MIN_DIST_DECOUP
+            distCoupling = float(input("\nSet the distance of virtual coupling (default = "+str(rbc.getDistanceCoupling())+"): "))
+            if (distCoupling < MIN_DIST_COUP) or (distCoupling > MAX_DIST_COUP):
+                print("\nThe distance of virtual coupling must be between ", MIN_DIST_COUP
                       ," and ", MAX_DIST_COUP, ".")
             else:
                 rbc.setDistanceCoupling(distCoupling)
                 break
         while True:
-            distDecoupling = float(input("\nSet the distance of virtual decoupling (default = "+str(rbc.distanceDecoupling)+"): "))
+            distDecoupling = float(input("\nSet the distance of virtual decoupling (default = "+str(rbc.getDistanceDecoupling())+"): "))
             if (distDecoupling < MIN_DIST_DECOUP) or (distDecoupling > MAX_DIST_DECOUP):
                 print("\nThe distance of virtual decoupling must be between ", MIN_DIST_DECOUP
                       ," and ", MAX_DIST_DECOUP, ".")

@@ -204,7 +204,7 @@ def stepHoldState(pos):
 def printDistances():
     print("\n-Distance between trains: ")
     i = 0
-    for train in trainList:
+    for i, train in trainList:
         if i != len(trainList)-1:
             print("\n---T", train[0], " and T", int(train[0])+1, ": ", distances[i], "m")
         i += 1
@@ -297,14 +297,11 @@ def run():
                 couplingTrain[1] = False
             if step == 400: 
                 print("\n######### Set change of direction for Train 3.")
-                traci.vehicle.changeTarget("3", "E35")
+                traci.vehicle.changeTarget("3", "E31")
                 decouplingTrain[0] = True
                 couplingTrain[0] = False
             
-            i = 0
-            for train in trainList:
-                if i == len(trainList)-1:
-                    break
+            for i in range(0, len(trainList)-1):
                 #Look if there are trains in decoupling mode
                 if decouplingTrain[i] == True:
                     decouplingTrain[i] = stepDecoupling(i)
@@ -316,7 +313,6 @@ def run():
                 
                 print("\n## State",i+1,":",state[i],"## InCoupling",i+1,":",couplingTrain[i],
                       "## InDecoupling",i+1,":", decouplingTrain[i])
-                i += 1
             printAllSpeed()
         traci.simulationStep()
         step += 1
@@ -348,7 +344,7 @@ def setFileRou():
 
 #Method to add a new train in the .rou.xml file
 def addNewTrain(idTrain):
-    colors = ["0,0,1","1,0,0","0,1,0","0,1,1","1,1,0","1,0,1","0.3,0.9,0.9","1,0.5,0","1,0.2,0.2","0.9,0.9,0.9"]
+    colors = ["1,1,0","1,0,0","0,1,0","0,1,1","0.1,0.3,1","1,0,1","0.3,0.9,0.9","1,0.5,0","1,0.2,0.2","0.9,0.9,0.9"]
     with open('railvc2.rou.xml', 'a') as f:
         line = "<vType id=\"rail"+str(idTrain)+"\" priority=\"1\" vClass=\"rail\" length=\"100\" accel=\"0.7\" decel=\"0.7\" sigma=\"1.0\" maxSpeed=\"30\" guiShape=\"rail\" color=\""+colors[idTrain-1]+"\"/>\n"
         f.write(line)

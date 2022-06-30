@@ -1,5 +1,5 @@
 <routes>
-	<vType id="rail1" priority="4" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="0,0,1"/>
+	<vType id="rail1" priority="4" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="1,1,0"/>
 	<vType id="rail2" priority="3" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="1,0,0"/>
 	<vType id="rail3" priority="2" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="0,1,0"/>
 

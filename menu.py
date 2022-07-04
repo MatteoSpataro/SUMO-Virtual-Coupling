@@ -3,13 +3,13 @@ import os
 import sys
 import optparse
 
-from rbc import MIN_DIST_COUP, MAX_DIST_COUP, MIN_DIST_DECOUP, MAX_DIST_DECOUP, MAX_SPEED, MIN_DIST_DECOUP, MIN_SPEED, Rbc
+from rbc2 import MIN_DIST_COUP, MAX_DIST_COUP, MIN_DIST_DECOUP, MAX_DIST_DECOUP, MIN_SPEED, MAX_SPEED, Rbc
 
 from sumolib import checkBinary
 import traci
 
 MIN_NUMBER_OF_TRAINS = 3
-MAX_NUMBER_OF_TRAINS = 10
+MAX_NUMBER_OF_TRAINS = 20
 
 if 'SUMO_HOME' in os.environ:
     tools = os.path.join(os.environ['SUMO_HOME'], 'tools')
@@ -49,10 +49,10 @@ def setFileRou():
                 wf.write(line)
 
 #Method to add a new train in the .rou.xml file
-def addNewTrain(idTrain):
+def addTrainInFile(idTrain):
     colors = ["1,1,0","1,0,0","0,1,0","0,1,1","0.1,0.3,1","1,0,1","0.3,0.9,0.9","1,0.5,0","1,0.2,0.2","0.9,0.9,0.9"]
     with open('railvc2.rou.xml', 'a') as f:
-        line = "<vType id=\"rail"+str(idTrain)+"\" priority=\"1\" vClass=\"rail\" length=\"100\" accel=\"0.7\" decel=\"0.7\" sigma=\"1.0\" maxSpeed=\"30\" guiShape=\"rail\" color=\""+colors[idTrain-1]+"\"/>\n"
+        line = "<vType id=\"rail"+str(idTrain)+"\" priority=\"1\" vClass=\"rail\" length=\"100\" accel=\"0.7\" decel=\"0.7\" sigma=\"1.0\" maxSpeed=\"30\" guiShape=\"rail\" color=\""+colors[(idTrain-1)%10]+"\"/>\n"
         f.write(line)
         depart = 24 + 25*(idTrain-4)
         line = "<vehicle id=\""+str(idTrain)+"\" type=\"rail"+str(idTrain)+"\" route=\"route3\" depart=\""+str(depart)+"\" />\n"
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     rbc = Rbc(nTrain)
         
     for i in range(4, nTrain+1):
-        addNewTrain(i)
+        addTrainInFile(i)
             
     with open('railvc2.rou.xml', 'a') as f:
         f.write('</routes>')

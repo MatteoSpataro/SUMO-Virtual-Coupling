@@ -10,8 +10,8 @@ from sumolib import checkBinary
 import traci
 
 MIN_NUMBER_OF_TRAINS = 3
-MAX_NUMBER_OF_TRAINS = 20
-DEPARTURE_INTERVAL = 25
+MAX_NUMBER_OF_TRAINS = 40
+DEPARTURE_INTERVAL = 22
 
 if 'SUMO_HOME' in os.environ:
     tools = os.path.join(os.environ['SUMO_HOME'], 'tools')
@@ -75,14 +75,16 @@ if __name__ == "__main__":
             setFileRou()
             break
     
-    rbc = Rbc(nTrain, DEPARTURE_INTERVAL)
+    
         
     for i in range(4, nTrain+1):
         addTrainInFile(i)
             
     with open('railvc2.rou.xml', 'a') as f:
         f.write('</routes>')
-                   
+
+    rbc = Rbc(nTrain, DEPARTURE_INTERVAL)             
+    
     if options.setParam:
         print("\nSet the parameters of the simulation.")
         print("\nRemember that the distance expressed in SUMO is 10 times greater than the real one: "+
@@ -102,11 +104,11 @@ if __name__ == "__main__":
                       ," and ", MAX_DIST_DECOUP, ".")
             else:
                 rbc.setDistanceDecoupling(distDecoupling)
-                break
+                break   
     
     answer = input("\n\nDo you want change the default speed of the trains? (Y, N) ")
     if answer == 'Y' or answer == 'y':
-        changeSpeeds() 
+        changeSpeeds(rbc.getTrainList()) 
 
     traci.start([sumoBinary, "-c", "railvc.sumocfg", "--tripinfo-output", "tripinfo.xml"])
     

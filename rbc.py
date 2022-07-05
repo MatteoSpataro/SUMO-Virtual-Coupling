@@ -217,14 +217,13 @@ class Rbc:
             return
         if self.__oldSpeed[pos] > speedAhead:
             #the train ahead is decreasing his speed
-            if self.__state[pos].__eq__("coupled") or self.__state[pos].__eq__("almost_coupled"):
-                traci.vehicle.setSpeed(trainFollower.getId(), speedFollower-2)
-                self._setSameSpeedFactores(trainFollower.getId(), trainAhead.getId())
-                print("\nTrain",trainAhead.getId(),"is decreasing his speed.")
-                trainFollower.setSpeed(speedFollower-1)
-                self.__isBraking[pos] = True
-                self.__state[pos] = "almost_coupled"
-                return
+            traci.vehicle.setSpeed(trainFollower.getId(), self.__oldSpeed[pos]-speedAhead - 2)
+            self._setSameSpeedFactores(trainFollower.getId(), trainAhead.getId())
+            print("\nTrain",trainAhead.getId(),"is decreasing his speed.")
+            trainFollower.setSpeed(speedFollower-1)
+            self.__isBraking[pos] = True
+            self.__state[pos] = "almost_coupled"
+            return
         if self.__isBraking[pos] == True:
             #The train ahead is no more braking
             self.__isBraking[pos] = False 
@@ -273,7 +272,8 @@ class Rbc:
     
     def _addTrain(self):
         speed = DEFAULT_SPEED - 0.8*3
-        newTrain = Train(str(len(self.__trainList)+1), speed)
+        firstTrain = self.__trainList[0]
+        newTrain = Train(str(len(self.__trainList)+1), firstTrain.getDefaultSpeed())
         self.__trainList.append(newTrain)
         traci.vehicle.setSpeed(str(len(self.__trainList)), speed)
         self.__oldSpeed.append(0.0)
@@ -314,6 +314,7 @@ class Rbc:
                     distance = traci.vehicle.getFollower(train.getId(), 0) #[idFollower, distance]
                     self.__distances.append(distance[1])
                 self.printDistances()
+                
                 for train in self.__trainList:
                     #Don't delete the limit on the distance if they are not in the right position
                     if train.getId().__eq__("1"):
@@ -330,13 +331,13 @@ class Rbc:
                             traci.vehicle.setSpeedMode(train.getId(), 30)
                     elif traci.vehicle.getRoadID(train.getId()).__eq__("E6"):
                         traci.vehicle.setSpeedMode(train.getId(), 30)
-                
-                if (step>200 and step%175==0): 
+                """
+                if (traci.vehicle.getRoadID(self.__trainList[0].getId()).__eq__("E36")): 
                     print("\n######### Set change of direction for the FIRST TRAIN.")
-                    traci.vehicle.changeTarget(self.__trainList[0].getId(), "E35")
+                    traci.vehicle.changeTarget(self.__trainList[0].getId(), "E43")
                     self.__decouplingTrain[0] = True
                     self.__couplingTrain[0] = False
-                """
+                
                 if step == 400: 
                     print("\n######### Set change of direction for Train 3.")
                     traci.vehicle.changeTarget("3", "E31")

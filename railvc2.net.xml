@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2022-06-21 11:18:33 by Eclipse SUMO netedit Version 1.13.0
+<!-- generated on 2022-07-05 15:53:05 by Eclipse SUMO netedit Version 1.13.0
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
 
     <input>
@@ -134,7 +134,10 @@
         <lane id=":e4_0_0" index="0" speed="13.00" length="0.75" shape="-300.76,398.40 -300.53,398.40 -300.38,398.38 -300.24,398.33 -300.04,398.23"/>
     </edge>
     <edge id=":e40_0" function="internal">
-        <lane id=":e40_0_0" index="0" speed="30.00" length="0.59" shape="-638.40,69.41 -638.40,69.58 -638.39,69.70 -638.36,69.82 -638.30,69.98"/>
+        <lane id=":e40_0_0" index="0" speed="25.50" length="12.00" shape="-638.40,67.91 -638.08,71.13 -637.25,73.69 -636.09,76.20 -634.77,79.23"/>
+    </edge>
+    <edge id=":e40_1" function="internal">
+        <lane id=":e40_1_0" index="0" speed="30.00" length="11.99" shape="-638.40,67.91 -638.40,79.90"/>
     </edge>
     <edge id=":e41_0" function="internal">
         <lane id=":e41_0_0" index="0" speed="30.00" length="0.91" shape="-598.83,173.57 -598.73,173.81 -598.64,173.98 -598.51,174.11 -598.30,174.28"/>
@@ -264,19 +267,22 @@
         <lane id="E38_0" index="0" speed="30.00" length="96.51" shape="-599.07,-258.16 -638.26,-169.97"/>
     </edge>
     <edge id="E39" from="e39" to="e40" priority="-1">
-        <lane id="E39_0" index="0" speed="30.00" length="238.73" shape="-638.40,-169.32 -638.40,69.41"/>
+        <lane id="E39_0" index="0" speed="30.00" length="237.23" shape="-638.40,-169.32 -638.40,67.91"/>
     </edge>
     <edge id="E4" from="e4" to="e6" priority="3">
         <lane id="E4_0" index="0" speed="13.00" length="214.95" shape="-300.04,398.23 -107.78,302.10"/>
     </edge>
     <edge id="E40" from="e40" to="e41" priority="-1">
-        <lane id="E40_0" index="0" speed="30.00" length="110.85" shape="-638.30,69.98 -598.83,173.57"/>
+        <lane id="E40_0" index="0" speed="30.00" length="100.95" shape="-634.77,79.23 -598.83,173.57"/>
     </edge>
     <edge id="E41" from="e41" to="e42" priority="-1">
         <lane id="E41_0" index="0" speed="30.00" length="123.22" shape="-598.30,174.28 -499.72,248.21"/>
     </edge>
     <edge id="E42" from="e42" to="e6" priority="4">
         <lane id="E42_0" index="0" speed="30.00" length="374.96" shape="-498.96,248.52 -126.89,295.03"/>
+    </edge>
+    <edge id="E43" from="e40" to="e43" priority="-1">
+        <lane id="E43_0" index="0" speed="30.00" length="130.10" shape="-638.40,79.90 -638.40,210.00"/>
     </edge>
     <edge id="E5" from="e5" to="e6" priority="1">
         <lane id="E5_0" index="0" speed="10.00" length="212.49" shape="-299.28,198.57 -109.23,293.60"/>
@@ -388,8 +394,9 @@
     <junction id="e4" type="priority" x="-300.00" y="400.00" incLanes="E1_0" intLanes=":e4_0_0" shape="-299.32,399.66 -300.76,396.80 -300.76,400.00 -300.20,399.99 -300.01,399.95 -299.82,399.90 -299.61,399.80">
         <request index="0" response="0" foes="0" cont="0"/>
     </junction>
-    <junction id="e40" type="priority" x="-640.00" y="70.00" incLanes="E39_0" intLanes=":e40_0_0" shape="-639.79,70.55 -636.80,69.41 -640.00,69.41 -639.99,69.84 -639.97,69.99 -639.94,70.14 -639.88,70.32">
-        <request index="0" response="0" foes="0" cont="0"/>
+    <junction id="e40" type="priority" x="-640.00" y="70.00" incLanes="E39_0" intLanes=":e40_0_0 :e40_1_0" shape="-640.00,79.90 -636.80,79.90 -636.27,79.80 -633.28,78.66 -634.24,76.42 -635.08,74.78 -635.79,73.43 -636.33,72.04 -636.68,70.30 -636.80,67.91 -640.00,67.91">
+        <request index="0" response="00" foes="00" cont="0"/>
+        <request index="1" response="00" foes="00" cont="0"/>
     </junction>
     <junction id="e41" type="priority" x="-600.00" y="175.00" incLanes="E40_0" intLanes=":e41_0_0" shape="-599.26,175.56 -597.34,173.00 -600.33,174.13 -600.07,174.75 -599.94,174.96 -599.78,175.13 -599.56,175.32">
         <request index="0" response="0" foes="0" cont="0"/>
@@ -397,6 +404,7 @@
     <junction id="e42" type="priority" x="-500.00" y="250.00" incLanes="E41_0" intLanes=":e42_0_0" shape="-499.16,250.11 -498.76,246.93 -500.68,249.49 -500.17,249.85 -499.98,249.94 -499.77,250.01 -499.51,250.06">
         <request index="0" response="0" foes="0" cont="0"/>
     </junction>
+    <junction id="e43" type="dead_end" x="-640.00" y="210.00" incLanes="E43_0" intLanes="" shape="-636.80,210.00 -640.00,210.00"/>
     <junction id="e5" type="priority" x="-300.00" y="200.00" incLanes="E3_0" intLanes=":e5_0_0" shape="-300.00,200.00 -298.57,197.14 -299.07,196.90 -299.26,196.85 -299.45,196.81 -299.68,196.80 -300.00,196.80">
         <request index="0" response="0" foes="0" cont="0"/>
     </junction>
@@ -448,7 +456,8 @@
     <connection from="E36" to="E37" fromLane="0" toLane="0" via=":e37_0_0" dir="s" state="M"/>
     <connection from="E37" to="E38" fromLane="0" toLane="0" via=":e38_0_0" dir="r" state="M"/>
     <connection from="E38" to="E39" fromLane="0" toLane="0" via=":e39_0_0" dir="s" state="M"/>
-    <connection from="E39" to="E40" fromLane="0" toLane="0" via=":e40_0_0" dir="s" state="M"/>
+    <connection from="E39" to="E40" fromLane="0" toLane="0" via=":e40_0_0" dir="R" state="M"/>
+    <connection from="E39" to="E43" fromLane="0" toLane="0" via=":e40_1_0" dir="s" state="M"/>
     <connection from="E4" to="E6" fromLane="0" toLane="0" via=":e6_3_0" dir="s" state="m"/>
     <connection from="E40" to="E41" fromLane="0" toLane="0" via=":e41_0_0" dir="s" state="M"/>
     <connection from="E41" to="E42" fromLane="0" toLane="0" via=":e42_0_0" dir="s" state="M"/>
@@ -490,7 +499,8 @@
     <connection from=":e38_0" to="E38" fromLane="0" toLane="0" dir="r" state="M"/>
     <connection from=":e39_0" to="E39" fromLane="0" toLane="0" dir="s" state="M"/>
     <connection from=":e4_0" to="E4" fromLane="0" toLane="0" dir="s" state="M"/>
-    <connection from=":e40_0" to="E40" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from=":e40_0" to="E40" fromLane="0" toLane="0" dir="R" state="M"/>
+    <connection from=":e40_1" to="E43" fromLane="0" toLane="0" dir="s" state="M"/>
     <connection from=":e41_0" to="E41" fromLane="0" toLane="0" dir="s" state="M"/>
     <connection from=":e42_0" to="E42" fromLane="0" toLane="0" dir="s" state="M"/>
     <connection from=":e5_0" to="E5" fromLane="0" toLane="0" dir="s" state="M"/>

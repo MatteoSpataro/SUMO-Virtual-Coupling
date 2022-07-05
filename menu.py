@@ -3,13 +3,15 @@ import os
 import sys
 import optparse
 
-from rbc2 import MIN_DIST_COUP, MAX_DIST_COUP, MIN_DIST_DECOUP, MAX_DIST_DECOUP, MIN_SPEED, MAX_SPEED, Rbc
+#To use file "rbc2" for emulate a communication channel with noise, else use file "rbc".
+from rbc import MIN_DIST_COUP, MAX_DIST_COUP, MIN_DIST_DECOUP, MAX_DIST_DECOUP, MIN_SPEED, MAX_SPEED, Rbc
 
 from sumolib import checkBinary
 import traci
 
 MIN_NUMBER_OF_TRAINS = 3
 MAX_NUMBER_OF_TRAINS = 20
+DEPARTURE_INTERVAL = 25
 
 if 'SUMO_HOME' in os.environ:
     tools = os.path.join(os.environ['SUMO_HOME'], 'tools')
@@ -54,7 +56,7 @@ def addTrainInFile(idTrain):
     with open('railvc2.rou.xml', 'a') as f:
         line = "<vType id=\"rail"+str(idTrain)+"\" priority=\"1\" vClass=\"rail\" length=\"100\" accel=\"0.7\" decel=\"0.7\" sigma=\"1.0\" maxSpeed=\"30\" guiShape=\"rail\" color=\""+colors[(idTrain-1)%10]+"\"/>\n"
         f.write(line)
-        depart = 24 + 25*(idTrain-4)
+        depart = DEPARTURE_INTERVAL-1 + DEPARTURE_INTERVAL*(idTrain-4)
         line = "<vehicle id=\""+str(idTrain)+"\" type=\"rail"+str(idTrain)+"\" route=\"route3\" depart=\""+str(depart)+"\" />\n"
         f.write(line)
 
@@ -73,7 +75,7 @@ if __name__ == "__main__":
             setFileRou()
             break
     
-    rbc = Rbc(nTrain)
+    rbc = Rbc(nTrain, DEPARTURE_INTERVAL)
         
     for i in range(4, nTrain+1):
         addTrainInFile(i)

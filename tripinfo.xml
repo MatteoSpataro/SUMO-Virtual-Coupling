@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2022-07-04 12:04:39 by Eclipse SUMO sumo Version 1.13.0
+<!-- generated on 2022-07-05 10:26:19 by Eclipse SUMO GUI Version 1.13.0
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
 
     <input>
@@ -14,14 +14,17 @@
     </output>
 
     <traci_server>
-        <remote-port value="61559"/>
+        <remote-port value="50346"/>
     </traci_server>
 
 </configuration>
 -->
 
 <tripinfos xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/tripinfo_file.xsd">
-    <tripinfo id="1" depart="0.00" departLane="E1_0" departPos="100.10" departSpeed="0.00" departDelay="0.00" arrival="211.00" arrivalLane="E35_0" arrivalPos="120.00" arrivalSpeed="20.80" duration="211.00" routeLength="3813.38" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="67.03" rerouteNo="2" devices="tripinfo_1" vType="rail1" speedFactor="1.00" vaporized=""/>
-    <tripinfo id="2" depart="0.00" departLane="E2_0" departPos="100.10" departSpeed="0.00" departDelay="0.00" arrival="456.00" arrivalLane="E35_0" arrivalPos="120.00" arrivalSpeed="20.00" duration="456.00" routeLength="8439.29" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="144.53" rerouteNo="4" devices="tripinfo_2" vType="rail2@2" speedFactor="1.00" vaporized=""/>
-    <tripinfo id="3" depart="0.00" departLane="E3_0" departPos="100.10" departSpeed="0.00" departDelay="0.00" arrival="719.00" arrivalLane="E37_0" arrivalPos="105.79" arrivalSpeed="19.20" duration="719.00" routeLength="13146.56" waitingTime="9.00" waitingCount="1" stopTime="0.00" timeLoss="244.02" rerouteNo="5" devices="tripinfo_3" vType="rail3@3" speedFactor="1.00" vaporized=""/>
+    <tripinfo id="1" depart="0.00" departLane="E1_0" departPos="100.10" departSpeed="0.00" departDelay="0.00" arrival="445.00" arrivalLane="E35_0" arrivalPos="120.00" arrivalSpeed="20.80" duration="445.00" routeLength="8412.92" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="142.62" rerouteNo="4" devices="tripinfo_1" vType="rail1" speedFactor="1.00" vaporized=""/>
+    <tripinfo id="2" depart="0.00" departLane="E2_0" departPos="100.10" departSpeed="0.00" departDelay="0.00" arrival="691.00" arrivalLane="E35_0" arrivalPos="120.00" arrivalSpeed="20.00" duration="691.00" routeLength="13038.83" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="222.04" rerouteNo="6" devices="tripinfo_2" vType="rail2@2" speedFactor="1.00" vaporized=""/>
+    <tripinfo id="3" depart="0.00" departLane="E3_0" departPos="100.10" departSpeed="0.00" departDelay="0.00" arrival="952.00" arrivalLane="E35_0" arrivalPos="120.00" arrivalSpeed="19.20" duration="952.00" routeLength="17662.05" waitingTime="9.00" waitingCount="1" stopTime="0.00" timeLoss="320.95" rerouteNo="9" devices="tripinfo_3" vType="rail3@3" speedFactor="1.00" vaporized=""/>
+    <tripinfo id="4" depart="24.00" departLane="E3_0" departPos="100.10" departSpeed="0.00" departDelay="0.00" arrival="1227.00" arrivalLane="E35_0" arrivalPos="120.00" arrivalSpeed="18.40" duration="1203.00" routeLength="22261.59" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="409.87" rerouteNo="10" devices="tripinfo_4" vType="rail4@4" speedFactor="1.00" vaporized=""/>
+    <tripinfo id="5" depart="49.00" departLane="E3_0" departPos="100.10" departSpeed="0.00" departDelay="0.00" arrival="1248.00" arrivalLane="E37_0" arrivalPos="105.79" arrivalSpeed="18.40" duration="1199.00" routeLength="22345.64" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="407.44" rerouteNo="9" devices="tripinfo_5" vType="rail5@5" speedFactor="1.00" vaporized=""/>
+    <tripinfo id="6" depart="74.00" departLane="E3_0" departPos="100.10" departSpeed="0.00" departDelay="0.00" arrival="1254.00" arrivalLane="E37_0" arrivalPos="105.79" arrivalSpeed="18.40" duration="1180.00" routeLength="22345.64" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="388.32" rerouteNo="9" devices="tripinfo_6" vType="rail6@6" speedFactor="1.00" vaporized=""/>
 </tripinfos>

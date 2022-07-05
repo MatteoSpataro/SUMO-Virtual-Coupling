@@ -26,7 +26,7 @@ PARAM_COUPLING = 5.5
 
 class Rbc:
        
-    def __init__(self, nTrain):
+    def __init__(self, nTrain, DEPARTURE_INTERVAL):
         self.__distanceCoupling = 10
         self.__distanceDecoupling = 100
         self.__trainList = [] #List of active trains
@@ -38,7 +38,8 @@ class Rbc:
         self.__isBraking = [False] #Is "True" if the train ahead is braking
         self.__incomingTrains = 0 #Number of trains that are coming
         self.__countDisconnection = [0] #Number of sequential disconnections for each train
-        
+        self.DEPARTURE_INTERVAL = DEPARTURE_INTERVAL
+
         self.__channel = Channel()
 
         for idTrain in range(0, 3):
@@ -306,7 +307,7 @@ class Rbc:
                 self._updateTrainsActive()
                 #Check if there is an incoming train
                 if self.__incomingTrains > 0:
-                    if step>24 and (step%25 == 0):
+                    if step > self.DEPARTURE_INTERVAL and (step%self.DEPARTURE_INTERVAL == 0):
                         self._addTrain()
                         self.__incomingTrains -= 1
                 if step > 1:

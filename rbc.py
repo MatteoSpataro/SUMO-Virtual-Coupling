@@ -117,9 +117,10 @@ class Rbc:
         if self.__distances[pos] < self.__distanceDecoupling:    
             trainFollowerSpeed = traci.vehicle.getSpeed(trainFollower.getId())
             traci.vehicle.setSpeed(trainFollower.getId(), trainFollowerSpeed - 1)
+            trainFollower.setSpeed(trainFollowerSpeed - 1)
             print("\nIn decoupling, Train", trainFollower.getId(), "is decreasing speed.")
             self.__state[pos] = "almost_decoupled"
-
+            """
             #Decrease the speed of all the trains coupled with the follower train
             i = 1
             for train in self.__trainList:
@@ -129,6 +130,14 @@ class Rbc:
                         traci.vehicle.setSpeed(idTrainFollower, trainFollowerSpeed - 2)
                         print("\nIn decoupling, Train", idTrainFollower, "is decreasing speed.")
                 i += 1
+            """
+            for idTrain in range(int(trainFollower.getId()), len(self.__trainList)-1):
+                if self.__state[idTrain-1].__eq__("coupled") or self.__state[idTrain-1].__eq__("almost_coupled"):
+                    idFollower = str(idTrain+1)
+                    speedAhead = self.__trainList[idTrain-1].getSpeed()
+                    traci.vehicle.setSpeed(idFollower, speedAhead - 1.5)
+                    self.__trainList[idTrain].setSpeed(speedAhead - 1.5)
+                    print("\nIn decoupling, Train", idTrain, "is decreasing speed.")
         else:
             #The trains are decoupled
             traci.vehicle.setSpeed(trainFollower.getId(), trainFollower.getDefaultSpeed())
@@ -338,12 +347,30 @@ class Rbc:
                     self.__decouplingTrain[0] = True
                     self.__couplingTrain[0] = False
                 
-                if step == 400: 
-                    print("\n######### Set change of direction for Train 3.")
-                    traci.vehicle.changeTarget("3", "E31")
+                if step == 2000: 
+                    print("\n######### Set change of direction for Train 1.")
+                    traci.vehicle.changeTarget("1", "E43")
                     self.__decouplingTrain[0] = True
                     self.__couplingTrain[0] = False
+                
+                if step == 2020:
+                    for train in self.__trainList:
+                        traci.vehicle.changeTarget(train.getId(), "E43")
+                        self.__decouplingTrain[0] = True
+                        self.__couplingTrain[0] = False
                 """
+                if step == 205: 
+                    print("\n######### Set change of direction for Train", self.__trainList[0].getId())
+                    traci.vehicle.changeTarget(self.__trainList[0].getId(), "E35")
+                    self.__decouplingTrain[0] = True
+                    self.__couplingTrain[0] = False
+
+                if step == 230: 
+                    print("\n######### Set change of direction for Train", self.__trainList[1].getId())
+                    traci.vehicle.changeTarget(self.__trainList[1].getId(), "E43")
+                    self.__decouplingTrain[1] = True
+                    self.__couplingTrain[1] = False
+
                 for i in range(0, len(self.__trainList)-1):
                     #Look if there are trains in decoupling mode
                     if self.__decouplingTrain[i] == True:

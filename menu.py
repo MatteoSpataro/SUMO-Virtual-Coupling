@@ -115,4 +115,4 @@ if __name__ == "__main__":
     rbc.run()
         
     if options.nogui:
-        fine = input("\nPress any button to end the simulation.")
+        fine = input("\nPress Enter button to end the simulation.")

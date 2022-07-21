@@ -20,4 +20,16 @@
 <vehicle id="7" type="rail7" route="route3" depart="87" />
 <vType id="rail8" priority="1" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="1,0.5,0"/>
 <vehicle id="8" type="rail8" route="route3" depart="109" />
+<vType id="rail9" priority="1" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="1,0.2,0.2"/>
+<vehicle id="9" type="rail9" route="route3" depart="131" />
+<vType id="rail10" priority="1" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="0.9,0.9,0.9"/>
+<vehicle id="10" type="rail10" route="route3" depart="153" />
+<vType id="rail11" priority="1" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="1,1,0"/>
+<vehicle id="11" type="rail11" route="route3" depart="175" />
+<vType id="rail12" priority="1" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="1,0,0"/>
+<vehicle id="12" type="rail12" route="route3" depart="197" />
+<vType id="rail13" priority="1" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="0,1,0"/>
+<vehicle id="13" type="rail13" route="route3" depart="219" />
+<vType id="rail14" priority="1" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="0,1,1"/>
+<vehicle id="14" type="rail14" route="route3" depart="241" />
 </routes>

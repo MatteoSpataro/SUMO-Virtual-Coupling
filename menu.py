@@ -31,16 +31,15 @@ def get_options():
 def changeSpeeds(trainList):
     print("\nThe speed of the train must be between",
           MIN_SPEED,"and",MAX_SPEED,"(",MIN_SPEED*10,"Km/h -",MAX_SPEED*10,"Km/h).")
-    
-    for i in range(0, len(trainList)):
+    for train in trainList:
         loop = True
         while loop:
-            print("\nSet the speed of the Train", i+1)
+            print("\nSet the speed of the Train", train.getId())
             newSpeed = float(input(": "))
             if (newSpeed < MIN_SPEED) or (newSpeed > MAX_SPEED):
                 print("\nThe speed of the train must be between",MIN_SPEED,"and",MAX_SPEED,".")
             else:
-                trainList[i].setDefaultSpeed(newSpeed)
+                train.setDefaultSpeed(newSpeed)
                 loop = False
 
 #Method to reset the .rou.xml file for a new simulation
@@ -74,9 +73,7 @@ if __name__ == "__main__":
         else:
             setFileRou()
             break
-    
-    
-        
+     
     for i in range(4, nTrain+1):
         addTrainInFile(i)
             

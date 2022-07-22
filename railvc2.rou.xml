@@ -32,4 +32,8 @@
 <vehicle id="13" type="rail13" route="route3" depart="219" />
 <vType id="rail14" priority="1" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="0,1,1"/>
 <vehicle id="14" type="rail14" route="route3" depart="241" />
+<vType id="rail15" priority="1" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="0.1,0.3,1"/>
+<vehicle id="15" type="rail15" route="route3" depart="263" />
+<vType id="rail16" priority="1" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="1,0,1"/>
+<vehicle id="16" type="rail16" route="route3" depart="285" />
 </routes>

@@ -64,8 +64,4 @@
 <vehicle id="28" type="rail28" route="route2" depart="551" />
 <vType id="rail29" priority="1" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="0.9,0.9,0.9"/>
 <vehicle id="29" type="rail29" route="route2" depart="573" />
-<vType id="rail30" priority="1" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="1,1,0"/>
-<vehicle id="30" type="rail30" route="route2" depart="595" />
-<vType id="rail31" priority="1" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="1,0,0"/>
-<vehicle id="31" type="rail31" route="route2" depart="617" />
 </routes>

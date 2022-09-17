@@ -48,7 +48,7 @@ class RbcVC(Rbc):
 
         for idTrain in range(0, 3):
             defaultSpeed = DEFAULT_SPEED - 0.8*idTrain
-            train = Train(str(idTrain+1), defaultSpeed)
+            train = Train(str(idTrain), defaultSpeed)
             self.__trainList.append(train)
         self.__incomingTrains = nTrain - 3
 
@@ -466,6 +466,7 @@ class RbcVC(Rbc):
                 self._updateTrainsActive()
                 self.__channel.changeTarget(self.__trainList[0].getId(), "E48")
                 self.__channel.setSpeed(self.__trainList[0].getId(), self.__trainList[0].getDefaultSpeed())
+            print("\nNumber of input errors: ",self.__channel.getErrors())
             traci.simulationStep()
             self.__step += 1
         print("\n\nSimulation completed.")

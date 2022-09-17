@@ -25,6 +25,7 @@ PARAM_COUPLING = 5.5
 DEFAULT_SPEED = 20.8
 MIN_SPEED = 10.0
 MAX_SPEED = 30.0
+MAX_DISCONNECTIONS = 6
 
 class RbcVC(Rbc):
        
@@ -214,7 +215,7 @@ class RbcVC(Rbc):
                 return True
         #Check if there is a connection problem
         if self.__distances[pos] == -1 and (not traci.vehicle.getRoadID(trainFollower.getId()).__eq__("E2")): 
-            if self.__countDisconnection[pos] < 6:
+            if self.__countDisconnection[pos] < MAX_DISCONNECTIONS:
                 #There are connectivity problems in these roads: E6, E7, E8, E41, E42, E43, E44, E45.
                 traci.vehicle.setSpeed(trainFollower.getId(), trainAheadSpeed)
                 trainFollower.setSpeed(trainAheadSpeed)

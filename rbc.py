@@ -15,5 +15,13 @@ class Rbc(ABC):
         pass
 
     @abstractmethod
+    def _updateTrainsActive(self):
+        pass
+
+    @abstractmethod
+    def _addTrain(self):
+        pass
+
+    @abstractmethod
     def run(self):
         pass

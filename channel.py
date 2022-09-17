@@ -16,7 +16,7 @@ import traci
 class Channel:
 
     def __init__(self):
-        self.__noise = 0.0001 #percentage of channel noise 
+        self.__noise = 0.0001 #failure rate
         self.errors = 0
 
     def setSpeedMode(self, vehID, speedMode):
@@ -80,7 +80,7 @@ class Channel:
 
     def getFollower(self, train, dist):
         return traci.vehicle.getFollower(train, dist)
-    def vehicle_getRoute(self, vehID):
+    def getRoute(self, vehID):
         return traci.vehicle.getRoute(vehID)
     def getIDList(self):
         return traci.vehicle.getIDList()

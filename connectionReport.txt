@@ -1,4 +1,4 @@
 Connection Report:
 with open('connectionReport.txt', 'a') as wf:
-                line = "Step "+str(self.__step)+"-Train "+trainFollower.getId()+" -Edge:"+traci.vehicle.getRoadID(trainFollower.getId())+"\n"
-                wf.write(line)
+    line = "Step "+str(self.__step)+"-Train "+trainFollower.getId()+" -Edge:"+traci.vehicle.getRoadID(trainFollower.getId())+"\n"
+    wf.write(line)

@@ -4,7 +4,7 @@ import sys
 import optparse
 
 #Import "RbcVC" from "rbcNoise" instead of "rbcVc" to emulate a communication channel with noise, where the input can fail.
-from rbcNoise import MIN_DIST_COUP, MAX_DIST_COUP, MIN_DIST_DECOUP, MAX_DIST_DECOUP, MIN_SPEED, MAX_SPEED, RbcVC
+from rbcVc import MIN_DIST_COUP, MAX_DIST_COUP, MIN_DIST_DECOUP, MAX_DIST_DECOUP, MIN_SPEED, MAX_SPEED, RbcVC
 from rbcNoVc import MIN_SPEED, MAX_SPEED, RbcNoVC
 
 from sumolib import checkBinary

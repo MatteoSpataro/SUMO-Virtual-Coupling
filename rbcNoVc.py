@@ -131,7 +131,7 @@ class RbcNoVC(Rbc):
                             train.setSpeed(train.getDefaultSpeed())
                 
                 self.printAllSpeed()
-                print("IncomingTrain:",self.__incomingTrains)
+                if self.__incomingTrains > 0: print("Incoming trains:",self.__incomingTrains)
             else:
                 self._updateTrainsActive()
                 traci.vehicle.changeTarget(self.__trainList[0].getId(), "E48")

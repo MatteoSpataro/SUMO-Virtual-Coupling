@@ -35,7 +35,7 @@ def get_options():
 
 def changeSpeeds(trainList,nTrain):
     MAX_DEFAULT_SPEED = 22
-    if nTrain > 15: MAX_DEFAULT_SPEED = 16
+    if nTrain > 15: MAX_DEFAULT_SPEED = 15
     print("\nThe speed of the train must be between",
           MIN_SPEED,"and",MAX_DEFAULT_SPEED,"(",MIN_SPEED*10,"Km/h -",MAX_DEFAULT_SPEED*10,"Km/h).")
     for train in trainList:

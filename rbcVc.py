@@ -44,6 +44,7 @@ class RbcVC(Rbc):
         self.__incomingTrains = 0 #Number of trains that are coming
         self.__countDisconnection = [0] #Number of sequential disconnections for each train
         self.DEPARTURE_INTERVAL = DEPARTURE_INTERVAL
+        self.__factorSpeed = 6
         self.__step = 1 #step of the simulation
 
         for idTrain in range(0, 3):
@@ -102,6 +103,7 @@ class RbcVC(Rbc):
             self.__isBraking.append(False)
             self.__state.append("decoupled")
             self.__countDisconnection.append(0)
+        self.__factorSpeed = self.__trainList[0].getDefaultSpeed() - 15
 
     def printAllSpeed(self):
         print("\nSpeeds:")
@@ -136,6 +138,11 @@ class RbcVC(Rbc):
                 if self.__state[posAhead].__eq__("almost_coupled") or self.__state[posAhead].__eq__("coupled"):
                     newSpeed = 0.1
                     if self.__distances[posAhead] == -1: return True
+                    if self.__distances[posAhead] < self.__distanceCoupling:
+                        newSpeed = speedAhead*0.40
+                        if traci.vehicle.getDecel(idFollower) < MAX_DECEL:
+                            traci.vehicle.setDecel(idFollower, traci.vehicle.getDecel(idFollower)+0.05)
+                        print("Train", idFollower, "is decreasing speed.")
                     if self.__distances[posAhead] < self.__distanceCoupling+self.__distanceCoupling*0.25:
                         newSpeed = speedAhead*0.50
                         if traci.vehicle.getDecel(idFollower) < MAX_DECEL:
@@ -158,6 +165,8 @@ class RbcVC(Rbc):
                         print("Train", idFollower, "is decreasing speed.")
                     elif traci.vehicle.getSpeed(idFollower)-speedAhead >= 0.5:
                         newSpeed = speedAhead*0.90
+                        if traci.vehicle.getDecel(idFollower) < MAX_DECEL:
+                            traci.vehicle.setDecel(idFollower, traci.vehicle.getDecel(idFollower)+0.05)
                         print("Train", idFollower, "is decreasing speed.")
                     else:
                         newSpeed = speedAhead
@@ -225,15 +234,24 @@ class RbcVC(Rbc):
                                            traci.vehicle.getDecel(trainFollower.getId())+0.02)
                 self.__countDisconnection[pos] += 1
             else:
-                traci.vehicle.setSpeed(trainFollower.getId(), trainFollower.getDefaultSpeed()*1.3)
-                trainFollower.setSpeed(trainFollower.getDefaultSpeed()*1.3)
+                traci.vehicle.setSpeed(trainFollower.getId(), trainFollower.getDefaultSpeed()*1.35)
+                trainFollower.setSpeed(trainFollower.getDefaultSpeed()*1.35)
                 traci.vehicle.setDecel(trainFollower.getId(), traci.vehicle.getDecel(trainFollower.getId()))
             return True
         self.__countDisconnection[pos] = 0
         traci.vehicle.setDecel(trainFollower.getId(), DEFAULT_DECEL)
 
-        if self.__distances[pos] >= self.__distanceCoupling*PARAM_COUPLING and trainFollowerSpeed < MAX_SPEED-1:
-            if speedDiff < 4:
+        if self.__distances[pos] >= self.__distanceDecoupling and trainFollowerSpeed < MAX_SPEED-1:
+            if speedDiff < 3.2:
+                traci.vehicle.setSpeed(trainFollower.getId(), trainFollowerSpeed+1)
+                trainFollower.setSpeed(trainFollowerSpeed+1)
+                print("In coupling, Train", trainFollower.getId(), ": increasing speed.")
+            else:
+                traci.vehicle.setSpeed(trainFollower.getId(), trainFollowerSpeed-1)
+                trainFollower.setSpeed(trainFollowerSpeed-1)
+                print("In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
+        elif self.__distances[pos] >= self.__distanceCoupling*PARAM_COUPLING + 5*self.__factorSpeed:
+            if speedDiff < 2:
                 traci.vehicle.setSpeed(trainFollower.getId(), trainFollowerSpeed+1)
                 trainFollower.setSpeed(trainFollowerSpeed+1)
                 print("In coupling, Train", trainFollower.getId(), ": increasing speed.")
@@ -243,10 +261,10 @@ class RbcVC(Rbc):
                 print("In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
         elif self.__distances[pos] > self.__distanceCoupling+self.__distanceCoupling*0.1:
             self.__state[pos] = "almost_coupled"
-            if speedDiff > 4.5:
-                traci.vehicle.setSpeed(trainFollower.getId(), trainFollowerSpeed-5)
-                trainFollower.setSpeed(trainFollowerSpeed-5)
-                if traci.vehicle.getDecel(trainFollower.getId()) < 1.5:
+            if speedDiff > 4:
+                traci.vehicle.setSpeed(trainFollower.getId(), trainFollowerSpeed-4)
+                trainFollower.setSpeed(trainFollowerSpeed-4)
+                if traci.vehicle.getDecel(trainFollower.getId()) < MAX_DECEL:
                     traci.vehicle.setDecel(trainFollower.getId(), traci.vehicle.getDecel(trainFollower.getId())+0.1)
                 print("In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
             elif speedDiff > 2.5:
@@ -262,8 +280,8 @@ class RbcVC(Rbc):
                 trainFollower.setSpeed(trainFollowerSpeed-0.7)
                 print("In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
             if speedDiff>=0 and speedDiff<0.7 and self.__state[pos-1].__eq__("almost_coupled"):
-                traci.vehicle.setSpeed(trainFollower.getId(), self.__trainList[pos].getSpeed()+0.1)
-                trainFollower.setSpeed(self.__trainList[pos].getSpeed()+0.1)
+                traci.vehicle.setSpeed(trainFollower.getId(), self.__trainList[pos].getSpeed()+0.3)
+                trainFollower.setSpeed(self.__trainList[pos].getSpeed()+0.3)
                 print("In coupling, Train", trainFollower.getId(), "is increasing his speed.")
             
         elif self.__distances[pos] > 0:
@@ -416,19 +434,23 @@ class RbcVC(Rbc):
                             traci.vehicle.setSpeedMode(train.getId(), 30)
                     elif traci.vehicle.getRoadID(train.getId()).__eq__("E6"):
                         traci.vehicle.setSpeedMode(train.getId(), 30)
-
-                if traci.vehicle.getRoadID(self.__trainList[0].getId()).__eq__("E30"): 
-                    print("\n##### Set change of direction for Train", self.__trainList[0].getId())
-                    traci.vehicle.changeTarget(self.__trainList[0].getId(), "E48")
-                    self.__decouplingTrain[0] = True
-                    self.__couplingTrain[0] = False
                 
-                if len(self.__trainList)>2:
-                    if traci.vehicle.getRoadID(self.__trainList[1].getId()).__eq__("E31"): 
-                        print("\n##### Set change of direction for Train", self.__trainList[1].getId())
-                        traci.vehicle.changeTarget(self.__trainList[1].getId(), "E51")
-                        self.__decouplingTrain[1] = True
-                        self.__couplingTrain[1] = False
+                stepsToWait = 250
+                if self.__trainList[0].getDefaultSpeed() <= 15: 
+                    stepsToWait = 250+25*self.__factorSpeed
+                if self.__step > stepsToWait:
+                    if traci.vehicle.getRoadID(self.__trainList[0].getId()).__eq__("E30"): 
+                        print("\n##### Set change of direction for Train", self.__trainList[0].getId())
+                        traci.vehicle.changeTarget(self.__trainList[0].getId(), "E48")
+                        self.__decouplingTrain[0] = True
+                        self.__couplingTrain[0] = False
+                
+                    if len(self.__trainList)>2:
+                        if traci.vehicle.getRoadID(self.__trainList[1].getId()).__eq__("E31"): 
+                            print("\n##### Set change of direction for Train", self.__trainList[1].getId())
+                            traci.vehicle.changeTarget(self.__trainList[1].getId(), "E51")
+                            self.__decouplingTrain[1] = True
+                            self.__couplingTrain[1] = False
                 
                 for i in range(0, len(self.__trainList)-1):
                     #Look if there are trains in decoupling mode
@@ -454,11 +476,15 @@ class RbcVC(Rbc):
                                     train.setSpeed(train.getDefaultSpeed()+1)
                                     traci.vehicle.setSpeedMode(train.getId(), 30)
                             else:
-                                traci.vehicle.setSpeed(str(idTrain), train.getDefaultSpeed()*0.008)
-                                train.setSpeed(train.getDefaultSpeed()*0.008)
-                        if traci.vehicle.getRoadID(str(idTrain)).__eq__("E3") and self._freeRoad(["E5"]):
-                            traci.vehicle.setSpeed(str(idTrain), train.getDefaultSpeed()*0.2)
-                            train.setSpeed(train.getDefaultSpeed()*0.2)
+                                traci.vehicle.setSpeed(str(idTrain), train.getDefaultSpeed()*0.005)
+                                train.setSpeed(train.getDefaultSpeed()*0.005)
+                        if traci.vehicle.getRoadID(str(idTrain)).__eq__("E3"):
+                            if self._freeRoad(["E5"]):
+                                traci.vehicle.setSpeed(str(idTrain), train.getDefaultSpeed()*0.2)
+                                train.setSpeed(train.getDefaultSpeed()*0.2)
+                            else:
+                                traci.vehicle.setSpeed(str(idTrain), traci.vehicle.getSpeed(str(idTrain-1)))
+                                train.setSpeed(traci.vehicle.getSpeed(str(idTrain-1)))
                 
                 self._updateOldSpeed()
                 self.printAllSpeed()

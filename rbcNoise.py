@@ -6,6 +6,12 @@ from ctypes.wintypes import INT
 import os
 import sys
 
+__author__ = "Matteo Spataro"
+__license__ = "Eclipse Public License"
+__version__ = "2.0"
+__maintainer__ = "Matteo Spataro"
+__email__ = "matteo.spataro@stud.unifi.it"
+
 if 'SUMO_HOME' in os.environ:
     tools = os.path.join(os.environ['SUMO_HOME'], 'tools')
     sys.path.append(tools)
@@ -24,8 +30,10 @@ MIN_DIST_DECOUP = 45
 MAX_DIST_DECOUP = 150
 PARAM_COUPLING = 5.5
 DEFAULT_SPEED = 20.8
-MIN_SPEED = 10.0
-MAX_SPEED = 30.0
+MIN_SPEED = 10.0 #equals to 100 km/h
+MAX_SPEED = 30.0 #equals to 300 km/h
+DEFAULT_DECEL = 0.7 #m/s^2
+MAX_DECEL = 0.9 #m/s^2
 
 class RbcVC(Rbc):
        
@@ -42,6 +50,7 @@ class RbcVC(Rbc):
         self.__incomingTrains = 0 #Number of trains that are coming
         self.__countDisconnection = [0] #Number of sequential disconnections for each train
         self.DEPARTURE_INTERVAL = DEPARTURE_INTERVAL
+        self.__factorSpeed = 6
         self.__step = 1 #step of the simulation
 
         self.__channel = Channel()
@@ -102,6 +111,7 @@ class RbcVC(Rbc):
             self.__isBraking.append(False)
             self.__state.append("decoupled")
             self.__countDisconnection.append(0)
+        self.__factorSpeed = self.__trainList[0].getDefaultSpeed() - 15
 
     def printAllSpeed(self):
         print("\nSpeeds:")
@@ -136,32 +146,39 @@ class RbcVC(Rbc):
                 if self.__state[posAhead].__eq__("almost_coupled") or self.__state[posAhead].__eq__("coupled"):
                     newSpeed = 0.1
                     if self.__distances[posAhead] == -1: return True
+                    if self.__distances[posAhead] < self.__distanceCoupling:
+                        newSpeed = speedAhead*0.40
+                        if self.__channel.getDecel(idFollower) < MAX_DECEL:
+                            self.__channel.setDecel(idFollower, self.__channel.getDecel(idFollower)+0.05)
+                        print("Train", idFollower, "is decreasing speed.")
                     if self.__distances[posAhead] < self.__distanceCoupling+self.__distanceCoupling*0.25:
                         newSpeed = speedAhead*0.50
-                        if self.__channel.getDecel(idFollower) < 0.9:
+                        if self.__channel.getDecel(idFollower) < MAX_DECEL:
                             self.__channel.setDecel(idFollower, self.__channel.getDecel(idFollower)+0.05)
-                        print("In decoupling EMERGENCY, Train", idFollower, "is decreasing speed.")
+                        print("Train", idFollower, "is decreasing speed.")
                     elif self.__distances[posAhead] < self.__distanceCoupling+self.__distanceCoupling*0.70:
                         newSpeed = speedAhead*0.55
-                        if self.__channel.getDecel(idFollower) < 0.9:
+                        if self.__channel.getDecel(idFollower) < MAX_DECEL:
                                 self.__channel.setDecel(idFollower, self.__channel.getDecel(idFollower)+0.05)
-                        print("In decoupling F1, Train", idFollower, "is decreasing speed.")
+                        print("Train", idFollower, "is decreasing speed.")
                     elif self.__channel.getSpeed(idFollower)-speedAhead >= 2:
                         newSpeed = speedAhead*0.60
-                        if self.__channel.getDecel(idFollower) < 0.9:
+                        if self.__channel.getDecel(idFollower) < MAX_DECEL:
                             self.__channel.setDecel(idFollower, self.__channel.getDecel(idFollower)+0.05)
-                        print("In decoupling F2, Train", idFollower, "is decreasing speed.")
+                        print("Train", idFollower, "is decreasing speed.")
                     elif self.__channel.getSpeed(idFollower)-speedAhead >= 1:
                         newSpeed = speedAhead*0.80
-                        if self.__channel.getDecel(idFollower) < 0.9:
+                        if self.__channel.getDecel(idFollower) < MAX_DECEL:
                             self.__channel.setDecel(idFollower, self.__channel.getDecel(idFollower)+0.05)
-                        print("In decoupling F2, Train", idFollower, "is decreasing speed.")
+                        print("Train", idFollower, "is decreasing speed.")
                     elif self.__channel.getSpeed(idFollower)-speedAhead >= 0.5:
                         newSpeed = speedAhead*0.90
-                        print("In decoupling F3, Train", idFollower, "is decreasing speed.")
+                        if self.__channel.getDecel(idFollower) < MAX_DECEL:
+                            self.__channel.setDecel(idFollower, self.__channel.getDecel(idFollower)+0.05)
+                        print("Train", idFollower, "is decreasing speed.")
                     else:
                         newSpeed = speedAhead
-                        print("In decoupling E, Train", idFollower, "is decreasing speed.")
+                        print("Train", idFollower, "is decreasing speed.")
                     self.__channel.setSpeed(idFollower, newSpeed)
                     self.__trainList[posAhead+1].setSpeed(newSpeed)
                     if self.__state[posAhead].__eq__("coupled"):
@@ -230,10 +247,19 @@ class RbcVC(Rbc):
                 self.__channel.setDecel(trainFollower.getId(), self.__channel.getDecel(trainFollower.getId()))
             return True
         self.__countDisconnection[pos] = 0
-        self.__channel.setDecel(trainFollower.getId(), 0.7)
+        self.__channel.setDecel(trainFollower.getId(), DEFAULT_DECEL)
 
-        if self.__distances[pos] >= self.__distanceCoupling*PARAM_COUPLING and trainFollowerSpeed < MAX_SPEED-1:
-            if speedDiff < 4:
+        if self.__distances[pos] >= self.__distanceDecoupling and trainFollowerSpeed < MAX_SPEED-1:
+            if speedDiff < 3.2:
+                self.__channel.setSpeed(trainFollower.getId(), trainFollowerSpeed+1)
+                trainFollower.setSpeed(trainFollowerSpeed+1)
+                print("In coupling, Train", trainFollower.getId(), ": increasing speed.")
+            else:
+                self.__channel.setSpeed(trainFollower.getId(), trainFollowerSpeed-1)
+                trainFollower.setSpeed(trainFollowerSpeed-1)
+                print("In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
+        elif self.__distances[pos] >= self.__distanceCoupling*PARAM_COUPLING + 5*self.__factorSpeed:
+            if speedDiff < 2:
                 self.__channel.setSpeed(trainFollower.getId(), trainFollowerSpeed+1)
                 trainFollower.setSpeed(trainFollowerSpeed+1)
                 print("In coupling, Train", trainFollower.getId(), ": increasing speed.")
@@ -243,10 +269,10 @@ class RbcVC(Rbc):
                 print("In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
         elif self.__distances[pos] > self.__distanceCoupling+self.__distanceCoupling*0.1:
             self.__state[pos] = "almost_coupled"
-            if speedDiff > 4.5:
-                self.__channel.setSpeed(trainFollower.getId(), trainFollowerSpeed-5)
-                trainFollower.setSpeed(trainFollowerSpeed-5)
-                if self.__channel.getDecel(trainFollower.getId()) < 1.5:
+            if speedDiff > 4:
+                self.__channel.setSpeed(trainFollower.getId(), trainFollowerSpeed-4)
+                trainFollower.setSpeed(trainFollowerSpeed-4)
+                if self.__channel.getDecel(trainFollower.getId()) < MAX_DECEL:
                     self.__channel.setDecel(trainFollower.getId(), self.__channel.getDecel(trainFollower.getId())+0.1)
                 print("In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
             elif speedDiff > 2.5:
@@ -261,9 +287,9 @@ class RbcVC(Rbc):
                 self.__channel.setSpeed(trainFollower.getId(), trainFollowerSpeed-0.7)
                 trainFollower.setSpeed(trainFollowerSpeed-0.7)
                 print("In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
-            if speedDiff >= 0 and speedDiff < 0.7 and self.__state[pos-1].__eq__("almost_coupled"):
-                self.__channel.setSpeed(trainFollower.getId(), self.__trainList[pos].getSpeed()+0.1)
-                trainFollower.setSpeed(self.__trainList[pos].getSpeed()+0.1)
+            if speedDiff>=0 and speedDiff<0.7 and self.__state[pos-1].__eq__("almost_coupled"):
+                self.__channel.setSpeed(trainFollower.getId(), self.__trainList[pos].getSpeed()+0.3)
+                trainFollower.setSpeed(self.__trainList[pos].getSpeed()+0.3)
                 print("In coupling, Train", trainFollower.getId(), "is increasing his speed.")
             
         elif self.__distances[pos] > 0:
@@ -416,18 +442,23 @@ class RbcVC(Rbc):
                             self.__channel.setSpeedMode(train.getId(), 30)
                     elif self.__channel.getRoadID(train.getId()).__eq__("E6"):
                         self.__channel.setSpeedMode(train.getId(), 30)
-                if self.__channel.getRoadID(self.__trainList[0].getId()).__eq__("E30"): 
-                    print("\n##### Set change of direction for Train", self.__trainList[0].getId())
-                    self.__channel.changeTarget(self.__trainList[0].getId(), "E48")
-                    self.__decouplingTrain[0] = True
-                    self.__couplingTrain[0] = False
                 
-                if len(self.__trainList)>2:
-                    if self.__channel.getRoadID(self.__trainList[1].getId()).__eq__("E31"): 
-                        print("\n##### Set change of direction for Train", self.__trainList[1].getId())
-                        self.__channel.changeTarget(self.__trainList[1].getId(), "E51")
-                        self.__decouplingTrain[1] = True
-                        self.__couplingTrain[1] = False
+                stepsToWait = 250
+                if self.__trainList[0].getDefaultSpeed() <= 15: 
+                    stepsToWait = 250+25*self.__factorSpeed
+                if self.__step > stepsToWait:
+                    if self.__channel.getRoadID(self.__trainList[0].getId()).__eq__("E30"): 
+                        print("\n##### Set change of direction for Train", self.__trainList[0].getId())
+                        self.__channel.changeTarget(self.__trainList[0].getId(), "E48")
+                        self.__decouplingTrain[0] = True
+                        self.__couplingTrain[0] = False
+                
+                    if len(self.__trainList)>2:
+                        if self.__channel.getRoadID(self.__trainList[1].getId()).__eq__("E31"): 
+                            print("\n##### Set change of direction for Train", self.__trainList[1].getId())
+                            self.__channel.changeTarget(self.__trainList[1].getId(), "E51")
+                            self.__decouplingTrain[1] = True
+                            self.__couplingTrain[1] = False
                 
                 for i in range(0, len(self.__trainList)-1):
                     #Look if there are trains in decoupling mode
@@ -438,7 +469,7 @@ class RbcVC(Rbc):
                         self.__couplingTrain[i] = self._stepCoupling(i)
                     elif not self.__state[i].__eq__("decoupled"):
                         self._stepHoldState(i)
-                    print("##",self._toStringState(i))
+                    print(self._toStringState(i))
                 
                 #if there are more than a cert amount of trains, the next train has to wait the last to enter the circuit
                 for train in self.__trainList:
@@ -453,15 +484,19 @@ class RbcVC(Rbc):
                                     train.setSpeed(train.getDefaultSpeed()+1)
                                     self.__channel.setSpeedMode(train.getId(), 30)
                             else:
-                                self.__channel.setSpeed(str(idTrain), train.getDefaultSpeed()*0.008)
-                                train.setSpeed(train.getDefaultSpeed()*0.008)
-                        if self.__channel.getRoadID(str(idTrain)).__eq__("E3") and self._freeRoad(["E5"]):
-                            self.__channel.setSpeed(str(idTrain), train.getDefaultSpeed()*0.2)
-                            train.setSpeed(train.getDefaultSpeed()*0.2)
+                                self.__channel.setSpeed(str(idTrain), train.getDefaultSpeed()*0.005)
+                                train.setSpeed(train.getDefaultSpeed()*0.005)
+                        if self.__channel.getRoadID(str(idTrain)).__eq__("E3"):
+                            if self._freeRoad(["E5"]):
+                                self.__channel.setSpeed(str(idTrain), train.getDefaultSpeed()*0.2)
+                                train.setSpeed(train.getDefaultSpeed()*0.2)
+                            else:
+                                self.__channel.setSpeed(str(idTrain), self.__channel.getSpeed(str(idTrain-1)))
+                                train.setSpeed(self.__channel.getSpeed(str(idTrain-1)))
                 
                 self._updateOldSpeed()
                 self.printAllSpeed()
-                print("IncomingTrain:",self.__incomingTrains)
+                print("Incoming train:",self.__incomingTrains)
             else:
                 self._updateTrainsActive()
                 self.__channel.changeTarget(self.__trainList[0].getId(), "E48")

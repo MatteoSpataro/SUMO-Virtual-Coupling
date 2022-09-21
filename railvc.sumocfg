@@ -1,6 +1,6 @@
 <configuration>
 	<input>
-		<net-file value="newNetRailvc2.net.xml"/>
+		<net-file value="railvc2.net.xml"/>
 		<route-files value="railvc2.rou.xml"/>
 		<additional-files value="railvc2.add.xml"/>
 	</input>

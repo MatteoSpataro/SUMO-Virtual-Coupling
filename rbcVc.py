@@ -6,6 +6,12 @@ from ctypes.wintypes import INT
 import os
 import sys
 
+__author__ = "Matteo Spataro"
+__license__ = "Eclipse Public License"
+__version__ = "2.0"
+__maintainer__ = "Matteo Spataro"
+__email__ = "matteo.spataro@stud.unifi.it"
+
 if 'SUMO_HOME' in os.environ:
     tools = os.path.join(os.environ['SUMO_HOME'], 'tools')
     sys.path.append(tools)
@@ -142,35 +148,35 @@ class RbcVC(Rbc):
                         newSpeed = speedAhead*0.40
                         if traci.vehicle.getDecel(idFollower) < MAX_DECEL:
                             traci.vehicle.setDecel(idFollower, traci.vehicle.getDecel(idFollower)+0.05)
-                        print("Train", idFollower, "is decreasing speed.")
+                        print(" Train", idFollower, "is decreasing speed.")
                     if self.__distances[posAhead] < self.__distanceCoupling+self.__distanceCoupling*0.25:
                         newSpeed = speedAhead*0.50
                         if traci.vehicle.getDecel(idFollower) < MAX_DECEL:
                             traci.vehicle.setDecel(idFollower, traci.vehicle.getDecel(idFollower)+0.05)
-                        print("Train", idFollower, "is decreasing speed.")
+                        print(" Train", idFollower, "is decreasing speed.")
                     elif self.__distances[posAhead] < self.__distanceCoupling+self.__distanceCoupling*0.70:
                         newSpeed = speedAhead*0.55
                         if traci.vehicle.getDecel(idFollower) < MAX_DECEL:
                                 traci.vehicle.setDecel(idFollower, traci.vehicle.getDecel(idFollower)+0.05)
-                        print("Train", idFollower, "is decreasing speed.")
+                        print(" Train", idFollower, "is decreasing speed.")
                     elif traci.vehicle.getSpeed(idFollower)-speedAhead >= 2:
                         newSpeed = speedAhead*0.60
                         if traci.vehicle.getDecel(idFollower) < MAX_DECEL:
                             traci.vehicle.setDecel(idFollower, traci.vehicle.getDecel(idFollower)+0.05)
-                        print("Train", idFollower, "is decreasing speed.")
+                        print(" Train", idFollower, "is decreasing speed.")
                     elif traci.vehicle.getSpeed(idFollower)-speedAhead >= 1:
                         newSpeed = speedAhead*0.80
                         if traci.vehicle.getDecel(idFollower) < MAX_DECEL:
                             traci.vehicle.setDecel(idFollower, traci.vehicle.getDecel(idFollower)+0.05)
-                        print("Train", idFollower, "is decreasing speed.")
+                        print(" Train", idFollower, "is decreasing speed.")
                     elif traci.vehicle.getSpeed(idFollower)-speedAhead >= 0.5:
                         newSpeed = speedAhead*0.90
                         if traci.vehicle.getDecel(idFollower) < MAX_DECEL:
                             traci.vehicle.setDecel(idFollower, traci.vehicle.getDecel(idFollower)+0.05)
-                        print("Train", idFollower, "is decreasing speed.")
+                        print(" Train", idFollower, "is decreasing speed.")
                     else:
                         newSpeed = speedAhead
-                        print("Train", idFollower, "is decreasing speed.")
+                        print(" Train", idFollower, "is decreasing speed.")
                     traci.vehicle.setSpeed(idFollower, newSpeed)
                     self.__trainList[posAhead+1].setSpeed(newSpeed)
                     if self.__state[posAhead].__eq__("coupled"):
@@ -245,20 +251,20 @@ class RbcVC(Rbc):
             if speedDiff < 3.2:
                 traci.vehicle.setSpeed(trainFollower.getId(), trainFollowerSpeed+1)
                 trainFollower.setSpeed(trainFollowerSpeed+1)
-                print("In coupling, Train", trainFollower.getId(), ": increasing speed.")
+                print(" In coupling, Train", trainFollower.getId(), ": increasing speed.")
             else:
                 traci.vehicle.setSpeed(trainFollower.getId(), trainFollowerSpeed-1)
                 trainFollower.setSpeed(trainFollowerSpeed-1)
-                print("In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
+                print(" In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
         elif self.__distances[pos] >= self.__distanceCoupling*PARAM_COUPLING + 5*self.__factorSpeed:
             if speedDiff < 2:
                 traci.vehicle.setSpeed(trainFollower.getId(), trainFollowerSpeed+1)
                 trainFollower.setSpeed(trainFollowerSpeed+1)
-                print("In coupling, Train", trainFollower.getId(), ": increasing speed.")
+                print(" In coupling, Train", trainFollower.getId(), ": increasing speed.")
             else:
                 traci.vehicle.setSpeed(trainFollower.getId(), trainFollowerSpeed-1)
                 trainFollower.setSpeed(trainFollowerSpeed-1)
-                print("In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
+                print(" In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
         elif self.__distances[pos] > self.__distanceCoupling+self.__distanceCoupling*0.1:
             self.__state[pos] = "almost_coupled"
             if speedDiff > 4:
@@ -266,23 +272,23 @@ class RbcVC(Rbc):
                 trainFollower.setSpeed(trainFollowerSpeed-4)
                 if traci.vehicle.getDecel(trainFollower.getId()) < MAX_DECEL:
                     traci.vehicle.setDecel(trainFollower.getId(), traci.vehicle.getDecel(trainFollower.getId())+0.1)
-                print("In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
+                print(" In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
             elif speedDiff > 2.5:
                 traci.vehicle.setSpeed(trainFollower.getId(), trainFollowerSpeed-2.5)
                 trainFollower.setSpeed(trainFollowerSpeed-2.5)
-                print("In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
+                print(" In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
             elif speedDiff > 1.5:
                 traci.vehicle.setSpeed(trainFollower.getId(), trainFollowerSpeed-1.3)
                 trainFollower.setSpeed(trainFollowerSpeed-1.3)
-                print("In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
+                print(" In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
             elif speedDiff > 1:
                 traci.vehicle.setSpeed(trainFollower.getId(), trainFollowerSpeed-0.7)
                 trainFollower.setSpeed(trainFollowerSpeed-0.7)
-                print("In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
+                print(" In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
             if speedDiff>=0 and speedDiff<0.7 and self.__state[pos-1].__eq__("almost_coupled"):
                 traci.vehicle.setSpeed(trainFollower.getId(), self.__trainList[pos].getSpeed()+0.3)
                 trainFollower.setSpeed(self.__trainList[pos].getSpeed()+0.3)
-                print("In coupling, Train", trainFollower.getId(), "is increasing his speed.")
+                print(" In coupling, Train", trainFollower.getId(), "is increasing his speed.")
             
         elif self.__distances[pos] > 0:
             print("\n\nCOUPLING COMPLETED BETWEEN T", trainAhead.getId(), " AND T", trainFollower.getId(), "\n")
@@ -415,7 +421,7 @@ class RbcVC(Rbc):
                     distance = traci.vehicle.getFollower(train.getId(), 0) #getFollower() -> [idFollower, distance]
                     self.__distances.append(distance[1])
                 self.printDistances()
-                
+                print("#")
                 for train in self.__trainList:
                     #Do not change the limit on the distance until they are not in the right position
                     if train.getId().__eq__("0"):
@@ -461,8 +467,8 @@ class RbcVC(Rbc):
                         self.__couplingTrain[i] = self._stepCoupling(i)
                     elif not self.__state[i].__eq__("decoupled"):
                         self._stepHoldState(i)
-                    print("##",self._toStringState(i))
-                
+                    print(self._toStringState(i))
+                print("#")
                 #If there are more than a cert amount of trains, the next train has to wait the last to enter the circuit
                 for train in self.__trainList:
                     idTrain = int(train.getId())

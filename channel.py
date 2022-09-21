@@ -12,6 +12,11 @@ else:
 from sumolib import checkBinary
 import traci
 
+__author__ = "Matteo Spataro"
+__license__ = "Eclipse Public License"
+__version__ = "2.0"
+__maintainer__ = "Matteo Spataro"
+__email__ = "matteo.spataro@stud.unifi.it"
 
 class Channel:
 

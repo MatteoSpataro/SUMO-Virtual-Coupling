@@ -10,6 +10,12 @@ from rbcNoVc import MIN_SPEED, MAX_SPEED, RbcNoVC
 from sumolib import checkBinary
 import traci
 
+__author__ = "Matteo Spataro"
+__license__ = "Eclipse Public License"
+__version__ = "2.0"
+__maintainer__ = "Matteo Spataro"
+__email__ = "matteo.spataro@stud.unifi.it"
+
 MIN_NUMBER_OF_TRAINS = 3
 MAX_NUMBER_OF_TRAINS = 22
 DEPARTURE_INTERVAL = 22

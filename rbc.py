@@ -1,5 +1,11 @@
 from abc import ABC, abstractmethod
 
+__author__ = "Matteo Spataro"
+__license__ = "Eclipse Public License"
+__version__ = "2.0"
+__maintainer__ = "Matteo Spataro"
+__email__ = "matteo.spataro@stud.unifi.it"
+
 class Rbc(ABC):
 
     @abstractmethod

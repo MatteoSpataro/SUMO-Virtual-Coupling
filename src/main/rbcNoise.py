@@ -34,6 +34,7 @@ MIN_SPEED = 10.0 #equals to 100 km/h
 MAX_SPEED = 30.0 #equals to 300 km/h
 DEFAULT_DECEL = 0.7 #m/s^2
 MAX_DECEL = 0.9 #m/s^2
+MARGIN_VC = 0.1 #error margin of VC, equals to 10%
 
 class RbcVC(Rbc):
        
@@ -150,37 +151,31 @@ class RbcVC(Rbc):
                         newSpeed = speedAhead*0.40
                         if self.__channel.getDecel(idFollower) < MAX_DECEL:
                             self.__channel.setDecel(idFollower, self.__channel.getDecel(idFollower)+0.05)
-                        print("Train", idFollower, "is decreasing speed.")
                     if self.__distances[posAhead] < self.__distanceCoupling+self.__distanceCoupling*0.25:
                         newSpeed = speedAhead*0.50
                         if self.__channel.getDecel(idFollower) < MAX_DECEL:
                             self.__channel.setDecel(idFollower, self.__channel.getDecel(idFollower)+0.05)
-                        print("Train", idFollower, "is decreasing speed.")
                     elif self.__distances[posAhead] < self.__distanceCoupling+self.__distanceCoupling*0.70:
                         newSpeed = speedAhead*0.55
                         if self.__channel.getDecel(idFollower) < MAX_DECEL:
                                 self.__channel.setDecel(idFollower, self.__channel.getDecel(idFollower)+0.05)
-                        print("Train", idFollower, "is decreasing speed.")
                     elif self.__channel.getSpeed(idFollower)-speedAhead >= 2:
                         newSpeed = speedAhead*0.60
                         if self.__channel.getDecel(idFollower) < MAX_DECEL:
                             self.__channel.setDecel(idFollower, self.__channel.getDecel(idFollower)+0.05)
-                        print("Train", idFollower, "is decreasing speed.")
                     elif self.__channel.getSpeed(idFollower)-speedAhead >= 1:
                         newSpeed = speedAhead*0.80
                         if self.__channel.getDecel(idFollower) < MAX_DECEL:
                             self.__channel.setDecel(idFollower, self.__channel.getDecel(idFollower)+0.05)
-                        print("Train", idFollower, "is decreasing speed.")
                     elif self.__channel.getSpeed(idFollower)-speedAhead >= 0.5:
                         newSpeed = speedAhead*0.90
                         if self.__channel.getDecel(idFollower) < MAX_DECEL:
                             self.__channel.setDecel(idFollower, self.__channel.getDecel(idFollower)+0.05)
-                        print("Train", idFollower, "is decreasing speed.")
                     else:
                         newSpeed = speedAhead
-                        print("Train", idFollower, "is decreasing speed.")
                     self.__channel.setSpeed(idFollower, newSpeed)
                     self.__trainList[posAhead+1].setSpeed(newSpeed)
+                    print(" Train", idFollower, "is decreasing speed.")
                     if self.__state[posAhead].__eq__("coupled"):
                         self.__state[posAhead] = "almost_coupled"
                 posAhead += 1
@@ -267,30 +262,28 @@ class RbcVC(Rbc):
                 self.__channel.setSpeed(trainFollower.getId(), trainFollowerSpeed-1)
                 trainFollower.setSpeed(trainFollowerSpeed-1)
                 print("In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
-        elif self.__distances[pos] > self.__distanceCoupling+self.__distanceCoupling*0.1:
+        elif self.__distances[pos] > self.__distanceCoupling + self.__distanceCoupling*MARGIN_VC:
             self.__state[pos] = "almost_coupled"
             if speedDiff > 4:
                 self.__channel.setSpeed(trainFollower.getId(), trainFollowerSpeed-4)
                 trainFollower.setSpeed(trainFollowerSpeed-4)
                 if self.__channel.getDecel(trainFollower.getId()) < MAX_DECEL:
                     self.__channel.setDecel(trainFollower.getId(), self.__channel.getDecel(trainFollower.getId())+0.1)
-                print("In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
             elif speedDiff > 2.5:
                 self.__channel.setSpeed(trainFollower.getId(), trainFollowerSpeed-2.5)
                 trainFollower.setSpeed(trainFollowerSpeed-2.5)
-                print("In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
             elif speedDiff > 1.5:
                 self.__channel.setSpeed(trainFollower.getId(), trainFollowerSpeed-1.3)
                 trainFollower.setSpeed(trainFollowerSpeed-1.3)
-                print("In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
             elif speedDiff > 1:
                 self.__channel.setSpeed(trainFollower.getId(), trainFollowerSpeed-0.7)
                 trainFollower.setSpeed(trainFollowerSpeed-0.7)
-                print("In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
             if speedDiff>=0 and speedDiff<0.7 and self.__state[pos-1].__eq__("almost_coupled"):
                 self.__channel.setSpeed(trainFollower.getId(), self.__trainList[pos].getSpeed()+0.3)
                 trainFollower.setSpeed(self.__trainList[pos].getSpeed()+0.3)
                 print("In coupling, Train", trainFollower.getId(), "is increasing his speed.")
+            else:
+                print(" In coupling, Train", trainFollower.getId(), "is decreasing his speed.")
             
         elif self.__distances[pos] > 0:
             print("\n\nCOUPLING COMPLETED BETWEEN T", trainAhead.getId(), " AND T", trainFollower.getId(), "\n")
@@ -337,7 +330,7 @@ class RbcVC(Rbc):
             self.__state[pos] = "almost_coupled"
             self.__couplingTrain[pos] = True #The trains must retrieve their coupling
             return
-        elif self.__distances[pos] > self.__distanceCoupling+1 and not(self.__state[pos].__eq__("decoupled")):
+        elif self.__distances[pos] > self.__distanceCoupling + MARGIN_VC*10 and not(self.__state[pos].__eq__("decoupled")):
             self.__channel.setSpeed(trainFollower.getId(), speedFollower+0.1)
             trainFollower.setSpeed(speedFollower+0.1)
             self.__state[pos] = "almost_coupled"

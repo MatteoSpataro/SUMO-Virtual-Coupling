@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\src",
+    "\\src\\main"
   ],
-  "SelectedNode": "\\rbcVc.py",
+  "SelectedNode": "\\src\\main\\menu.py",
   "PreviewInSolutionExplorer": false
 }

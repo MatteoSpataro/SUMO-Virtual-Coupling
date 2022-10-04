@@ -28,6 +28,7 @@ The program can be run in two ways: by clicking on the executable "menu.py" or b
         python menu.py --setParam
         
 By default, the program run the SUMO simulation with graphical interface (sumo-gui). If you want to run the simulation without it, you can add the option "--nogui”. Furthermore, if you don't want a simulation with Virtual Coupling, you can add the option "--novc" before you execute the instruction in the terminal.
+
 In the end, if you want to run the simulation with the maximum capacity (30 trains), you have to enter the following instruction in the terminal: 
         
         python menu.py --maxTrains

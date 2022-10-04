@@ -1,4 +1,4 @@
-# SUMO-Virtual-Coupling
+# Simulation of ERTMS Level 4: Virtual Coupling
 
 This project is based on today's need to optimize railway capacity through the Virtual Coupling technique applied to a platoon of trains. The aim is to carry out a simulation of various Virtual Coupling scenarios using the Eclipse SUMO (Simulation of Urban MObility) software, through which it is possible to draw considerations regarding the variations in the capacity of a railway network.
 

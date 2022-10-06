@@ -1,6 +1,8 @@
 from ast import If
 import math
 from train import *
+import matplotlib.pyplot as plt
+import numpy as np
 
 from ctypes.wintypes import INT
 import os
@@ -52,6 +54,7 @@ class RbcVC(Rbc):
         self.__countDisconnection = [0] #Number of sequential disconnections for each train
         self.DEPARTURE_INTERVAL = DEPARTURE_INTERVAL
         self.__factorSpeed = 6
+        self.__distToPlot = [0] #To plot the distance graph between the first 2 trains
         self.__step = 1 #step of the simulation
 
         for idTrain in range(0, 3):
@@ -386,6 +389,18 @@ class RbcVC(Rbc):
     def _toStringState(self, pos):
         return f"State T{self.__trainList[pos].getId()}-T{self.__trainList[pos+1].getId()}: {self.__state[pos]}; InCoupling: {self.__couplingTrain[pos]}; InDecoupling: {self.__decouplingTrain[pos]}."
 
+    #Method to plot the distance graph between the first 2 trains
+    def _plotDist(self):
+        steps = np.arange(0, self.__step, 1)
+        for i in range(0,len(self.__distToPlot)):
+            self.__distToPlot[i] = self.__distToPlot[i]*10
+        plt.plot(steps, self.__distToPlot, label="T0 - T1")
+        plt.xlabel('Time [s]')
+        plt.ylabel('Distance [m]')
+        plt.title('Virtual Coupling')
+        plt.legend()
+        plt.show()
+
     def run(self):
         traci.simulationStep()
         self._setInitialParameters()
@@ -488,12 +503,20 @@ class RbcVC(Rbc):
                 self._updateOldSpeed()
                 self.printAllSpeed()
                 if self.__incomingTrains > 0: print("Incoming trains:",self.__incomingTrains)
+                #To plot the distance graph you have to run these instructions
+                #if self.__distances[0] != -1:
+                #    self.__distToPlot.append(self.__distances[0])
+                #else:
+                #    self.__distToPlot.append(self.__distToPlot[-1])
             else:
+                #self.__distToPlot.append(0)
                 self._updateTrainsActive()
                 traci.vehicle.changeTarget(self.__trainList[0].getId(), "E48")
                 traci.vehicle.setSpeed(self.__trainList[0].getId(), self.__trainList[0].getDefaultSpeed())
             traci.simulationStep()
             self.__step += 1
         print("\n\nSimulation completed.")
+        #To plot the distance graph you have to run this instruction
+        #self._plotDist()
         traci.close()
         sys.stdout.flush()

@@ -1,5 +1,6 @@
-# SUMO-Virtual-Coupling
-The goal is to create a program that allows you to simulate multiple Virtual Coupling scenarios in the SUMO environment.
+# Simulation of ERTMS Level 4: Virtual Coupling
+
+This project is based on today's need to optimize railway capacity through the Virtual Coupling technique applied to a platoon of trains. The aim is to carry out a simulation of various Virtual Coupling scenarios using the Eclipse SUMO (Simulation of Urban MObility) software, through which it is possible to draw considerations regarding the variations in the capacity of a railway network.
 
 What is SUMO
 ------------
@@ -9,7 +10,7 @@ What is SUMO
 It is mainly developed by employees of the [Institute of Transportation Systems at the German Aerospace Center](https://www.dlr.de/ts).
 
 
-Where to get it
+Where to get SUMO
 ---------------
 
 You can download SUMO via our [downloads site](https://sumo.dlr.de/docs/Downloads.html).
@@ -19,12 +20,18 @@ As the program is still under development and is extended continuously, we advic
         git clone --recursive https://github.com/eclipse/sumo
 
 
-Execute the program
+Execute this project 
 ---------------
 
-The program can be run in two ways: by clicking on the executable "menu.py" or by entering the name of the program in an open terminal within the directory containing the latter. Note that starting the program from the terminal is the only way to access the advanced settings that allow you to change some parameters. To do this, you need to enter the following instruction in the terminal: “python menu.py --setParam”.
-By default, the program run the SUMO simulation with graphical interface (sumo-gui). If you want to run the simulation without it, you can enter the following instruction in the terminal: “python menu.py --nogui” or enter “python menu.py --setParam --nogui”.
+The program can be run in two ways: by clicking on the executable "menu.py" or by entering the name of the program in a terminal within the directory containing the latter. Note that starting the program from the terminal is the only way to access the advanced settings that allow you to change some parameters. To do this, you need to enter the following instruction in the terminal: 
 
+        python menu.py --setParam
+        
+By default, the program run the SUMO simulation with graphical interface (sumo-gui). If you want to run the simulation without it, you can add the option "--nogui”. Furthermore, if you don't want a simulation with Virtual Coupling, you can add the option "--novc" before you execute the instruction in the terminal.
+
+In the end, if you want to run the simulation with the maximum capacity (30 trains), you have to enter the following instruction in the terminal: 
+        
+        python menu.py --maxTrains
 
 License
 -------

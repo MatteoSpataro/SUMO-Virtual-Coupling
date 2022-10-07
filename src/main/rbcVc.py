@@ -131,6 +131,10 @@ class RbcVC(Rbc):
         traci.vehicle.setAccel(trainFollower, traci.vehicle.getAccel(trainAhead))
         traci.vehicle.setDecel(trainFollower, traci.vehicle.getDecel(trainAhead))
 
+    def _changeDecel(self, idFollower, decelAhead):
+        newDecel = decelAhead+0.01 
+        if newDecel < MAX_DECEL: traci.vehicle.setDecel(idFollower, newDecel)
+
     def _stepDecoupling(self, pos):
         trainAhead = self.__trainList[pos]
         trainFollower = self.__trainList[pos+1]
@@ -146,38 +150,32 @@ class RbcVC(Rbc):
                 idFollower = self.__trainList[posAhead+1].getId()
                 idAhead = self.__trainList[posAhead].getId()
                 speedAhead = traci.vehicle.getSpeed(idAhead)
+                decelAhead = traci.vehicle.getDecel(idAhead)
                 if self.__state[posAhead].__eq__("almost_coupled") or self.__state[posAhead].__eq__("coupled"):
                     newSpeed = 0.1
                     if self.__distances[posAhead] == -1: return True
                     if self.__distances[posAhead] < self.__distanceCoupling:
                         newSpeed = speedAhead*0.40
-                        if traci.vehicle.getDecel(idFollower) < MAX_DECEL:
-                            traci.vehicle.setDecel(idFollower, traci.vehicle.getDecel(idAhead)+0.01)
+                        self._changeDecel(idFollower, decelAhead)
                     if self.__distances[posAhead] < self.__distanceCoupling+self.__distanceCoupling*0.25:
                         newSpeed = speedAhead*0.50
-                        if traci.vehicle.getDecel(idFollower) < MAX_DECEL:
-                            traci.vehicle.setDecel(idFollower, traci.vehicle.getDecel(idAhead)+0.01)
+                        self._changeDecel(idFollower, decelAhead)
                     elif self.__distances[posAhead] < self.__distanceCoupling+self.__distanceCoupling*0.70:
                         newSpeed = speedAhead*0.55
-                        if traci.vehicle.getDecel(idFollower) < MAX_DECEL:
-                                traci.vehicle.setDecel(idFollower, traci.vehicle.getDecel(idAhead)+0.01)
+                        self._changeDecel(idFollower, decelAhead)
                     elif traci.vehicle.getSpeed(idFollower)-speedAhead >= 2:
                         newSpeed = speedAhead*0.60
-                        if traci.vehicle.getDecel(idFollower) < MAX_DECEL:
-                            traci.vehicle.setDecel(idFollower, traci.vehicle.getDecel(idAhead)+0.01)
+                        self._changeDecel(idFollower, decelAhead)
                     elif traci.vehicle.getSpeed(idFollower)-speedAhead >= 1:
                         newSpeed = speedAhead*0.80
-                        if traci.vehicle.getDecel(idFollower) < MAX_DECEL:
-                            traci.vehicle.setDecel(idFollower, traci.vehicle.getDecel(idAhead)+0.01)
+                        self._changeDecel(idFollower, decelAhead)
                     elif traci.vehicle.getSpeed(idFollower)-speedAhead >= 0.5:
                         newSpeed = speedAhead*0.90
-                        if traci.vehicle.getDecel(idFollower) < MAX_DECEL:
-                            traci.vehicle.setDecel(idFollower, traci.vehicle.getDecel(idAhead)+0.01)
+                        self._changeDecel(idFollower, decelAhead)
                     else:
                         newSpeed = speedAhead
                     traci.vehicle.setSpeed(idFollower, newSpeed)
                     self.__trainList[posAhead+1].setSpeed(newSpeed)
-                    print(" Train", idFollower, "is decreasing speed.")
                     if self.__state[posAhead].__eq__("coupled"):
                         self.__state[posAhead] = "almost_coupled"
                 posAhead += 1
@@ -189,6 +187,8 @@ class RbcVC(Rbc):
             else:
                 traci.vehicle.setSpeed(trainFollower.getId(), trainFollower.getDefaultSpeed())
                 trainFollower.setSpeed(trainFollower.getDefaultSpeed())
+            print("\n\nDECOUPLING COMPLETED BETWEEN T", trainAhead.getId(), " AND T", trainFollower.getId(), "\n")
+            self.__state[pos] = "decoupled"
             #Reset the speed of all the trains coupled or almost coupled with the follower train
             for posAhead in range(pos+1, len(self.__trainList)-1):
                 if self.__state[posAhead].__eq__("coupled") or self.__state[posAhead].__eq__("almost_coupled"):
@@ -198,8 +198,6 @@ class RbcVC(Rbc):
                     if traci.vehicle.getDecel(trainBehind.getId()) > DEFAULT_DECEL:
                         traci.vehicle.setDecel(trainBehind.getId(), DEFAULT_DECEL)
                     print("\nIn decoupling, Train", trainBehind.getId(), "reset the speed.")
-            print("\n\nDECOUPLING COMPLETED BETWEEN T", trainAhead.getId(), " AND T", trainFollower.getId(), "\n")
-            self.__state[pos] = "decoupled"
             return False
         return True
 

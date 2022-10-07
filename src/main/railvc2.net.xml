@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2022-09-14 18:50:44 by Eclipse SUMO netedit Version 1.14.1
+<!-- generated on 2022-10-07 09:25:08 by Eclipse SUMO netedit Version 1.14.1
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
 
     <input>
-        <sumo-net-file value="C:\Users\spata\source\repos\MatteoSpataro\SUMO-Virtual-Coupling\newNetRailvc2.net.xml"/>
+        <sumo-net-file value="C:\Users\spata\source\repos\MatteoSpataro\SUMO-Virtual-Coupling\src\main\railvc2.net.xml"/>
     </input>
 
     <output>
-        <output-file value="C:\Users\spata\source\repos\MatteoSpataro\SUMO-Virtual-Coupling\newNetRailvc2.net.xml"/>
+        <output-file value="C:\Users\spata\source\repos\MatteoSpataro\SUMO-Virtual-Coupling\src\main\railvc2.net.xml"/>
     </output>
 
     <processing>
@@ -40,16 +40,16 @@
         <lane id=":e0_0_0" index="0" speed="30.00" length="0.10" shape="100.00,298.40 100.00,298.40"/>
     </edge>
     <edge id=":e10_0" function="internal">
-        <lane id=":e10_0_0" index="0" speed="24.00" length="0.94" shape="398.19,200.46 398.27,200.19 398.29,200.00 398.27,199.81 398.19,199.54"/>
+        <lane id=":e10_0_0" index="0" speed="26.00" length="0.94" shape="398.19,200.46 398.27,200.19 398.29,200.00 398.27,199.81 398.19,199.54"/>
     </edge>
     <edge id=":e11_0" function="internal">
-        <lane id=":e11_0_0" index="0" speed="24.50" length="0.80" shape="383.70,151.23 383.63,151.01 383.56,150.86 383.46,150.73 383.30,150.56"/>
+        <lane id=":e11_0_0" index="0" speed="26.50" length="0.80" shape="383.70,151.23 383.63,151.01 383.56,150.86 383.46,150.73 383.30,150.56"/>
     </edge>
     <edge id=":e12_0" function="internal">
-        <lane id=":e12_0_0" index="0" speed="25.50" length="0.80" shape="349.44,116.70 349.27,116.54 349.14,116.44 348.99,116.37 348.77,116.30"/>
+        <lane id=":e12_0_0" index="0" speed="27.50" length="0.80" shape="349.44,116.70 349.27,116.54 349.14,116.44 348.99,116.37 348.77,116.30"/>
     </edge>
     <edge id=":e13_0" function="internal">
-        <lane id=":e13_0_0" index="0" speed="28.00" length="0.47" shape="299.99,101.67 299.86,101.63 299.76,101.61 299.67,101.60 299.53,101.60"/>
+        <lane id=":e13_0_0" index="0" speed="29.00" length="0.47" shape="299.99,101.67 299.86,101.63 299.76,101.61 299.67,101.60 299.53,101.60"/>
     </edge>
     <edge id=":e14_0" function="internal">
         <lane id=":e14_0_0" index="0" speed="28.00" length="0.47" shape="-400.00,101.60 -400.14,101.60 -400.23,101.59 -400.33,101.57 -400.46,101.53"/>
@@ -178,13 +178,13 @@
         <lane id=":e6_11_0" index="0" speed="9.52" length="15.49" shape="-109.02,302.72 -104.61,301.00 -100.74,300.50 -97.39,301.22 -94.57,303.17"/>
     </edge>
     <edge id=":e7_0" function="internal">
-        <lane id=":e7_0_0" index="0" speed="28.00" length="0.47" shape="299.53,298.40 299.67,298.40 299.76,298.39 299.86,298.37 299.99,298.33"/>
+        <lane id=":e7_0_0" index="0" speed="29.00" length="0.47" shape="299.53,298.40 299.67,298.40 299.76,298.39 299.86,298.37 299.99,298.33"/>
     </edge>
     <edge id=":e8_0" function="internal">
-        <lane id=":e8_0_0" index="0" speed="25.50" length="0.80" shape="348.77,283.70 348.99,283.63 349.14,283.56 349.27,283.46 349.44,283.30"/>
+        <lane id=":e8_0_0" index="0" speed="27.50" length="0.80" shape="348.77,283.70 348.99,283.63 349.14,283.56 349.27,283.46 349.44,283.30"/>
     </edge>
     <edge id=":e9_0" function="internal">
-        <lane id=":e9_0_0" index="0" speed="24.50" length="0.80" shape="383.30,249.44 383.46,249.27 383.56,249.14 383.63,248.99 383.70,248.77"/>
+        <lane id=":e9_0_0" index="0" speed="26.50" length="0.80" shape="383.30,249.44 383.46,249.27 383.56,249.14 383.63,248.99 383.70,248.77"/>
     </edge>
 
     <edge id="E0" from="e6" to="e0" priority="-1">
@@ -194,13 +194,13 @@
         <lane id="E1_0" index="0" speed="13.00" length="149.24" shape="-450.00,398.40 -300.76,398.40"/>
     </edge>
     <edge id="E10" from="e10" to="e11" priority="-1">
-        <lane id="E10_0" index="0" speed="24.00" length="50.43" shape="398.19,199.54 383.70,151.23"/>
+        <lane id="E10_0" index="0" speed="26.00" length="50.43" shape="398.19,199.54 383.70,151.23"/>
     </edge>
     <edge id="E11" from="e11" to="e12" priority="-1">
-        <lane id="E11_0" index="0" speed="25.00" length="47.88" shape="383.30,150.56 349.44,116.70"/>
+        <lane id="E11_0" index="0" speed="27.00" length="47.88" shape="383.30,150.56 349.44,116.70"/>
     </edge>
     <edge id="E12" from="e12" to="e13" priority="-1">
-        <lane id="E12_0" index="0" speed="26.00" length="50.93" shape="348.77,116.30 299.99,101.67"/>
+        <lane id="E12_0" index="0" speed="28.00" length="50.93" shape="348.77,116.30 299.99,101.67"/>
     </edge>
     <edge id="E13" from="e13" to="e14" priority="-1">
         <lane id="E13_0" index="0" speed="30.00" length="699.53" shape="299.53,101.60 -400.00,101.60"/>
@@ -308,13 +308,13 @@
         <lane id="E6_0" index="0" speed="30.00" length="199.53" shape="100.00,298.40 299.53,298.40"/>
     </edge>
     <edge id="E7" from="e7" to="e8" priority="-1">
-        <lane id="E7_0" index="0" speed="26.00" length="50.93" shape="299.99,298.33 348.77,283.70"/>
+        <lane id="E7_0" index="0" speed="28.00" length="50.93" shape="299.99,298.33 348.77,283.70"/>
     </edge>
     <edge id="E8" from="e8" to="e9" priority="-1">
-        <lane id="E8_0" index="0" speed="25.00" length="47.88" shape="349.44,283.30 383.30,249.44"/>
+        <lane id="E8_0" index="0" speed="27.00" length="47.88" shape="349.44,283.30 383.30,249.44"/>
     </edge>
     <edge id="E9" from="e9" to="e10" priority="-1">
-        <lane id="E9_0" index="0" speed="24.00" length="50.43" shape="383.70,248.77 398.19,200.46"/>
+        <lane id="E9_0" index="0" speed="26.00" length="50.43" shape="383.70,248.77 398.19,200.46"/>
     </edge>
 
     <junction id="e0" type="priority" x="100.00" y="300.00" incLanes="E0_0" intLanes=":e0_0_0" shape="100.00,300.00 100.00,296.80 100.00,300.00">

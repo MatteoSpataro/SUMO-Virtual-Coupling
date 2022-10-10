@@ -10,6 +10,4 @@
 	<vehicle id="0" type="rail0" route="route0" depart="0" />
 	<vehicle id="1" type="rail1" route="route1" depart="0" />
 	<vehicle id="2" type="rail2" route="route2" depart="0" />
-<vType id="rail3" priority="1" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="0,1,1"/>
-<vehicle id="3" type="rail3" route="route2" depart="1" />
 </routes>

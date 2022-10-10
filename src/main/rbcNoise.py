@@ -1,7 +1,8 @@
 from ast import If
 import math
 from train import *
-
+import matplotlib.pyplot as plt
+import numpy as np
 from ctypes.wintypes import INT
 import os
 import sys
@@ -25,7 +26,7 @@ from rbc import Rbc
 from channel import Channel
 
 MIN_DIST_COUP = 5
-MAX_DIST_COUP = 40
+MAX_DIST_COUP = 50
 MIN_DIST_DECOUP = 45
 MAX_DIST_DECOUP = 150
 PARAM_COUPLING = 5.5
@@ -34,6 +35,7 @@ MIN_SPEED = 10.0 #equals to 100 km/h
 MAX_SPEED = 30.0 #equals to 300 km/h
 DEFAULT_DECEL = 0.7 #m/s^2
 MAX_DECEL = 0.9 #m/s^2
+MAX_DISCONNECTIONS = 6
 MARGIN_VC = 0.1 #error margin of VC, equals to 10%
 
 class RbcVC(Rbc):
@@ -52,6 +54,7 @@ class RbcVC(Rbc):
         self.__countDisconnection = [0] #Number of sequential disconnections for each train
         self.DEPARTURE_INTERVAL = DEPARTURE_INTERVAL
         self.__factorSpeed = 6
+        self.__distToPlot = [0] #To plot the distance graph between the first 2 trains
         self.__step = 1 #step of the simulation
 
         self.__channel = Channel()
@@ -187,16 +190,17 @@ class RbcVC(Rbc):
             else:
                 self.__channel.setSpeed(trainFollower.getId(), trainFollower.getDefaultSpeed())
                 trainFollower.setSpeed(trainFollower.getDefaultSpeed())
-            #Reset the speed of all the trains coupled with the follower train
-            for idFollower in range(int(trainFollower.getId()), len(self.__trainList)):
-                if self.__state[idFollower-1].__eq__("coupled") or self.__state[idFollower-1].__eq__("almost_coupled"):
-                    self.__channel.setSpeed(str(idFollower+1), trainFollower.getSpeed())
-                    self.__trainList[idFollower].setSpeed(trainFollower.getSpeed())
-                    if self.__channel.getDecel(str(idFollower+1)) > 0.7:
-                        self.__channel.setDecel(str(idFollower+1), 0.7)
-                    print("\nIn decoupling, Train ", idFollower+1, "reset the speed.")
             print("\n\nDECOUPLING COMPLETED BETWEEN T", trainAhead.getId(), " AND T", trainFollower.getId(), "\n")
             self.__state[pos] = "decoupled"
+            #Reset the speed of all the trains coupled or almost coupled with the follower train
+            for posAhead in range(pos+1, len(self.__trainList)-1):
+                if self.__state[posAhead].__eq__("coupled") or self.__state[posAhead].__eq__("almost_coupled"):
+                    trainBehind = self.__trainList[posAhead+1]
+                    self.__channel.setSpeed(trainBehind.getId(), trainFollower.getSpeed())
+                    trainBehind.setSpeed(trainFollower.getSpeed())
+                    if self.__channel.getDecel(trainBehind.getId()) > DEFAULT_DECEL:
+                        self.__channel.setDecel(trainBehind.getId(), DEFAULT_DECEL)
+                    print("\nIn decoupling, Train", trainBehind.getId(), "reset the speed.")
             return False
         return True
 
@@ -388,6 +392,18 @@ class RbcVC(Rbc):
     def _toStringState(self, pos):
         return f"State T{self.__trainList[pos].getId()}-T{self.__trainList[pos+1].getId()}: {self.__state[pos]}; InCoupling: {self.__couplingTrain[pos]}; InDecoupling: {self.__decouplingTrain[pos]}."
 
+    #Method to plot the distance graph between the first 2 trains
+    def _plotDist(self):
+        steps = np.arange(0, self.__step, 1)
+        for i in range(0,len(self.__distToPlot)):
+            self.__distToPlot[i] = self.__distToPlot[i]*10
+        plt.plot(steps, self.__distToPlot, label="T0 - T1")
+        plt.xlabel('Time [s]')
+        plt.ylabel('Distance [m]')
+        plt.title('Virtual Coupling')
+        plt.legend()
+        plt.show()
+
     def run(self):
         traci.simulationStep()
         self._setInitialParameters()
@@ -478,7 +494,7 @@ class RbcVC(Rbc):
                                     self.__channel.setSpeedMode(train.getId(), 30)
                             else:
                                 self.__channel.setSpeed(str(idTrain), train.getDefaultSpeed()*0.005)
-                                train.setSpeed(train.getDefaultSpeed()*0.005)
+                                train.setSpeed(train.getDefaultSpeed()*0.002)
                         if self.__channel.getRoadID(str(idTrain)).__eq__("E3"):
                             if self._freeRoad(["E5"]):
                                 self.__channel.setSpeed(str(idTrain), train.getDefaultSpeed()*0.2)
@@ -490,7 +506,13 @@ class RbcVC(Rbc):
                 self._updateOldSpeed()
                 self.printAllSpeed()
                 print("Incoming train:",self.__incomingTrains)
+                #To plot the distance graph you have to run these instructions
+                #if self.__distances[0] != -1:
+                #    self.__distToPlot.append(self.__distances[0])
+                #else:
+                #    self.__distToPlot.append(self.__distToPlot[-1])
             else:
+                #self.__distToPlot.append(0)
                 self._updateTrainsActive()
                 self.__channel.changeTarget(self.__trainList[0].getId(), "E48")
                 self.__channel.setSpeed(self.__trainList[0].getId(), self.__trainList[0].getDefaultSpeed())
@@ -498,5 +520,7 @@ class RbcVC(Rbc):
             traci.simulationStep()
             self.__step += 1
         print("\n\nSimulation completed.")
+        #To plot the distance graph you have to run this instruction
+        #self._plotDist()
         traci.close()
         sys.stdout.flush()

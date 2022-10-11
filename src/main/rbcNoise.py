@@ -25,24 +25,24 @@ import traci
 from rbc import Rbc
 from channel import Channel
 
-MIN_DIST_COUP = 5
-MAX_DIST_COUP = 50
-MIN_DIST_DECOUP = 45
-MAX_DIST_DECOUP = 150
-PARAM_COUPLING = 5.5
+MIN_DIST_COUP = 5 #min distance of virtual coupling
+MAX_DIST_COUP = 50 #max distance of virtual coupling
+MIN_DIST_DECOUP = 45  #min distance of virtual decoupling
+MAX_DIST_DECOUP = 150 #max distance of virtual decoupling
+PARAM_COUPLING = 5.5  #virtual coupling policy parameter
 DEFAULT_SPEED = 20.8
 MIN_SPEED = 10.0 #equals to 100 km/h
 MAX_SPEED = 30.0 #equals to 300 km/h
 DEFAULT_DECEL = 0.7 #m/s^2
 MAX_DECEL = 0.9 #m/s^2
-MAX_DISCONNECTIONS = 6
+MAX_DISCONNECTIONS = 6 #max number of tolerated disconnections between trains
 MARGIN_VC = 0.1 #error margin of VC, equals to 10%
 
 class RbcVC(Rbc):
        
     def __init__(self, nTrain, DEPARTURE_INTERVAL):
-        self.__distanceCoupling = 10
-        self.__distanceDecoupling = 100
+        self.__distanceCoupling = 10    #equals to x10 real meters
+        self.__distanceDecoupling = 100 #equals to x10 real meters
         self.__trainList = [] #List of active trains
         self.__distances = [] #List with the distances between trains
         self.__oldSpeed = [] #List with the speeds of the trains in the previous step

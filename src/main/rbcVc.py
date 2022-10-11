@@ -25,38 +25,38 @@ import traci
 
 from rbc import Rbc
 
-MIN_DIST_COUP = 5
-MAX_DIST_COUP = 50
-MIN_DIST_DECOUP = 45
-MAX_DIST_DECOUP = 150
-PARAM_COUPLING = 5.5
+MIN_DIST_COUP = 5     #min distance of virtual coupling
+MAX_DIST_COUP = 50    #max distance of virtual coupling
+MIN_DIST_DECOUP = 45  #min distance of virtual decoupling
+MAX_DIST_DECOUP = 150 #max distance of virtual decoupling
+PARAM_COUPLING = 5.5  #VC policy parameter
 DEFAULT_SPEED = 20.8
 MIN_SPEED = 10.0 #equals to 100 km/h
 MAX_SPEED = 30.0 #equals to 300 km/h
 DEFAULT_DECEL = 0.7 #m/s^2
 MAX_DECEL = 0.9 #m/s^2
-MAX_DISCONNECTIONS = 6
+MAX_DISCONNECTIONS = 6 #max number of tolerated disconnections between trains
 MARGIN_VC = 0.1 #error margin of VC, equals to 10%
 
 class RbcVC(Rbc):
        
     def __init__(self, nTrain, DEPARTURE_INTERVAL):
-        self.__distanceCoupling = 10 #equals to 100 m
-        self.__distanceDecoupling = 100 #equals to 1 km
-        self.__trainList = [] #List of active trains
-        self.__distances = [] #List with the distances between trains
-        self.__oldSpeed = [] #List with the speeds of the trains in the previous step
-        self.__couplingTrain = [True] #Train is trying to reach the coupling if is "True"
+        self.__distanceCoupling = 10    #equals to x10 real meters
+        self.__distanceDecoupling = 100 #equals to x10 real meters
+        self.__trainList = []  #List of active trains
+        self.__distances = []  #List with the distances between trains
+        self.__oldSpeed = []   #List with the speeds of the trains in the previous step
+        self.__couplingTrain = [True]    #Train is trying to reach the coupling if is "True"
         self.__decouplingTrain = [False] #Train is trying to reach the decoupling if is "True"
         self.__state = ["decoupled"] #List with the state of each train
-        self.__isBraking = [False] #Is "True" if the train ahead is braking
-        self.__incomingTrains = 0 #Number of trains that are coming
-        self.__countDisconnection = [0] #Number of sequential disconnections for each train
+        self.__isBraking = [False]   #Is "True" if the train ahead is braking
+        self.__incomingTrains = 0    #Number of trains that are coming
+        self.__countDisconnection = [0]  #Number of sequential disconnections for each train
         self.DEPARTURE_INTERVAL = DEPARTURE_INTERVAL
         self.__factorSpeed = 6
         self.__distToPlot = [0] #To plot the distance graph between the first 2 trains
         self.__step = 1 #step of the simulation
-
+        #initialize trainList:
         for idTrain in range(0, 3):
             defaultSpeed = DEFAULT_SPEED - 0.8*idTrain
             train = Train(str(idTrain), defaultSpeed)
@@ -106,6 +106,7 @@ class RbcVC(Rbc):
             raise Exception("Sorry, decoupling distance must be between",MIN_DIST_DECOUP,"and",MAX_DIST_DECOUP)
         self.__distanceDecoupling = distance
     
+    #Method to initialize the parameters before the start of the simulation.
     def _setInitialParameters(self):
         for train in range(2, len(self.__trainList)):
             self.__couplingTrain.append(True)
@@ -126,6 +127,7 @@ class RbcVC(Rbc):
         for train in self.__trainList:
             self.__oldSpeed.append(traci.vehicle.getSpeed(train.getId()))
 
+    #Method to set the velocity profile of the trainAhead into the trainFollower.
     def _setSameSpeedFactores(self, trainFollower, trainAhead):
         traci.vehicle.setSpeedFactor(trainFollower, traci.vehicle.getSpeedFactor(trainAhead))
         traci.vehicle.setAccel(trainFollower, traci.vehicle.getAccel(trainAhead))
@@ -180,7 +182,7 @@ class RbcVC(Rbc):
                         self.__state[posAhead] = "almost_coupled"
                 posAhead += 1
         else:
-            #Now trains are decoupled and they have to remain decoupled
+            #now trains are decoupled and they have to remain decoupled
             if trainAhead.getDefaultSpeed() < trainFollower.getDefaultSpeed():
                 traci.vehicle.setSpeed(trainFollower.getId(), trainAhead.getDefaultSpeed())
                 trainFollower.setSpeed(trainAhead.getDefaultSpeed())
@@ -201,7 +203,7 @@ class RbcVC(Rbc):
             return False
         return True
 
-    #Check if the train ahead is decoupling: in this case we can't modify the speed of the following trains 
+    #Method to check if the train ahead is decoupling: in this case we can't modify the speed of the following trains 
     #in order not to overwrite the changes made during the decoupling phase of the train ahead.
     def _trainAheadDecoupling(self, idTrainAhead):
         while idTrainAhead > 0:
@@ -219,16 +221,16 @@ class RbcVC(Rbc):
         trainAheadSpeed = traci.vehicle.getSpeed(trainAhead.getId())
         trainFollowerSpeed = traci.vehicle.getSpeed(trainFollower.getId())
         speedDiff = trainFollowerSpeed - trainAheadSpeed
-        #The follower train is coming 
+        #check if the follower train is entering the circuit:
         if traci.vehicle.getRoadID(trainFollower.getId()).__eq__("E3") or traci.vehicle.getRoadID(trainFollower.getId()).__eq__("E5"):
             self._setSameSpeedFactores(trainFollower.getId(), trainAhead.getId())
             return True
         if self.__state[pos].__eq__("almost_coupled"):    
-            #Check if there is a train ahead that is decoupling.
+            #check if there is a train ahead that is decoupling:
             if self._trainAheadDecoupling(pos+1):
                 print("Train ", trainFollower.getId(), "skip step coupling.")
                 return True
-        #Check if there is a connection problem
+        #check if there is a connection problem:
         if self.__distances[pos] == -1 and (not traci.vehicle.getRoadID(trainFollower.getId()).__eq__("E2")): 
             if self.__countDisconnection[pos] < MAX_DISCONNECTIONS:
                 #There are connectivity problems in some roads.
@@ -350,7 +352,7 @@ class RbcVC(Rbc):
             else:
                 print("---T", self.__trainList[i].getId(), " and T", int(self.__trainList[i].getId())+1, ": undefined.")
 
-    #Updates the list of active trains
+    #Method to update the list of active trains.
     def _updateTrainsActive(self):
         idTrains = traci.vehicle.getIDList()
         for train in self.__trainList:
@@ -366,6 +368,7 @@ class RbcVC(Rbc):
                 self.__isBraking.pop(0)
                 self.__countDisconnection.pop(0)
     
+    #Method to check if there are no trains in transit in a given road.
     def _freeRoad(self, roadToCheck):
         for train in self.__trainList:
             for roadId in roadToCheck:
@@ -389,7 +392,7 @@ class RbcVC(Rbc):
     def _toStringState(self, pos):
         return f"State T{self.__trainList[pos].getId()}-T{self.__trainList[pos+1].getId()}: {self.__state[pos]}; InCoupling: {self.__couplingTrain[pos]}; InDecoupling: {self.__decouplingTrain[pos]}."
 
-    #Method to plot the distance graph between the first 2 trains
+    #Method to plot the distance graph between the first 2 trains.
     def _plotDist(self):
         steps = np.arange(0, self.__step, 1)
         for i in range(0,len(self.__distToPlot)):

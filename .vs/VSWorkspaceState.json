@@ -1,7 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\src"
+    "\\src",
+    "\\src\\main"
   ],
   "SelectedNode": "\\src\\main",
   "PreviewInSolutionExplorer": false

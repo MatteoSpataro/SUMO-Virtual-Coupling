@@ -19,6 +19,8 @@ __email__ = "matteo.spataro@stud.unifi.it"
 MIN_NUMBER_OF_TRAINS = 3
 MAX_NUMBER_OF_TRAINS = 22
 DEPARTURE_INTERVAL = 22
+DEFAULT_NET_FILE = "default.rou.xml"
+NET_FILE = "railvc.rou.xml"
 
 if 'SUMO_HOME' in os.environ:
     tools = os.path.join(os.environ['SUMO_HOME'], 'tools')
@@ -57,8 +59,8 @@ def changeSpeeds(trainList,nTrain):
 
 #Method to reset the .rou.xml file for a new simulation
 def setFileRou():
-    with open('default.rou.xml', 'r') as rf:
-        with open('railvc2.rou.xml', 'w') as wf:
+    with open(DEFAULT_NET_FILE, 'r') as rf:
+        with open(NET_FILE, 'w') as wf:
             for line in rf:
                 wf.write(line)
 
@@ -66,7 +68,7 @@ def setFileRou():
 def addTrainInFile(idTrain):
     idTrain = idTrain-1
     colors = ["1,1,0","1,0,0","0,1,0","0,1,1","0.1,0.3,1","1,0,1","0.3,0.9,0.9","1,0.5,0","1,0.2,0.2","0.9,0.9,0.9"]
-    with open('railvc2.rou.xml', 'a') as f:
+    with open(NET_FILE, 'a') as f:
         line = "<vType id=\"rail"+str(idTrain)+"\" priority=\"1\" vClass=\"rail\" length=\"100\" accel=\"0.7\" decel=\"0.7\" sigma=\"1.0\" maxSpeed=\"30\" guiShape=\"rail\" color=\""+colors[(idTrain)%10]+"\"/>\n"
         f.write(line)
         depart = DEPARTURE_INTERVAL+1 + DEPARTURE_INTERVAL*(idTrain-4)
@@ -95,7 +97,7 @@ if __name__ == "__main__":
     for i in range(4, nTrain+1):
         addTrainInFile(i)
             
-    with open('railvc2.rou.xml', 'a') as f:
+    with open(NET_FILE, 'a') as f:
         f.write('</routes>')
 
     if options.novc:

@@ -152,12 +152,12 @@ class RbcNoVC(Rbc):
                 self.printAllSpeed()
                 if self.__incomingTrains > 0: print("Incoming trains:",self.__incomingTrains)
                 #To plot the distance graph you have to run these instructions
-                #if self.__distances[0] != -1:
-                #    self.__distToPlot.append(self.__distances[0])
-                #else:
-                #    self.__distToPlot.append(self.__distToPlot[-1])
+                if self.__distances[0] != -1:
+                    self.__distToPlot.append(self.__distances[0])
+                else:
+                    self.__distToPlot.append(self.__distToPlot[-1])
             else:
-                #self.__distToPlot.append(0)
+                self.__distToPlot.append(0)
                 self._updateTrainsActive()
                 traci.vehicle.changeTarget(self.__trainList[0].getId(), "E48")
                 traci.vehicle.setSpeed(self.__trainList[0].getId(), self.__trainList[0].getDefaultSpeed())
@@ -165,7 +165,7 @@ class RbcNoVC(Rbc):
             self.__step += 1
         print("\n\nSimulation completed.")
         #To plot the distance graph you have to run this instruction
-        #self._plotDist()
+        self._plotDist()
         traci.close()
         sys.stdout.flush()
                 

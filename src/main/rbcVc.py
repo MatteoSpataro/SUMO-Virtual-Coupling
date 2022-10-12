@@ -53,6 +53,7 @@ class RbcVC(Rbc):
         self.__incomingTrains = 0    #Number of trains that are coming
         self.__countDisconnection = [0]  #Number of sequential disconnections for each train
         self.DEPARTURE_INTERVAL = DEPARTURE_INTERVAL
+        self.TRAINS_TO_WAIT = 0
         self.__factorSpeed = 6
         self.__distToPlot = [0] #To plot the distance graph between the first 2 trains
         self.__step = 1 #step of the simulation
@@ -389,6 +390,28 @@ class RbcVC(Rbc):
         self.__countDisconnection.append(0)
         self._setSameSpeedFactores(str(len(self.__trainList)-1), str(len(self.__trainList)-2))
 
+    def _controlTrainIncoming(self, train):
+        idTrain = int(train.getId())
+        roadToCheck = ["E36","E35","E34","E33"]
+        if idTrain > self.TRAINS_TO_WAIT:
+            if traci.vehicle.getRoadID(str(idTrain)).__eq__("E5"):
+                if ((traci.vehicle.getRoadID(str(idTrain-1)).__eq__("E0") or traci.vehicle.getRoadID(str(idTrain-1)).__eq__("E6"))
+                                    and self._freeRoad(roadToCheck)):
+                    if train.getSpeed() < train.getDefaultSpeed():
+                        traci.vehicle.setSpeed(str(idTrain), train.getDefaultSpeed()+1)
+                        train.setSpeed(train.getDefaultSpeed()+1)
+                        traci.vehicle.setSpeedMode(train.getId(), 30)
+                else:
+                    traci.vehicle.setSpeed(str(idTrain), train.getDefaultSpeed()*0.002)
+                    train.setSpeed(train.getDefaultSpeed()*0.002)
+            if traci.vehicle.getRoadID(str(idTrain)).__eq__("E3"):
+                if self._freeRoad(["E5"]):
+                     traci.vehicle.setSpeed(str(idTrain), train.getDefaultSpeed()*0.2)
+                     train.setSpeed(train.getDefaultSpeed()*0.2)
+                else:
+                     traci.vehicle.setSpeed(str(idTrain), traci.vehicle.getSpeed(str(idTrain-1)))
+                     train.setSpeed(traci.vehicle.getSpeed(str(idTrain-1)))
+
     def _toStringState(self, pos):
         return f"State T{self.__trainList[pos].getId()}-T{self.__trainList[pos+1].getId()}: {self.__state[pos]}; InCoupling: {self.__couplingTrain[pos]}; InDecoupling: {self.__decouplingTrain[pos]}."
 
@@ -407,7 +430,7 @@ class RbcVC(Rbc):
     def run(self):
         traci.simulationStep()
         self._setInitialParameters()
-        trainsToWait = 10+math.floor(20-self.__trainList[0].getDefaultSpeed())
+        self.TRAINS_TO_WAIT = 10+math.floor(20-self.__trainList[0].getDefaultSpeed())
 
         for train in self.__trainList:
             self.__oldSpeed.append(0)
@@ -480,28 +503,9 @@ class RbcVC(Rbc):
                         self._stepHoldState(i)
                     print(self._toStringState(i))
                 print("#")
-                #If there are more than a cert amount of trains, the next train has to wait the last to enter the circuit
+                #If there are more than a cert amount of trains, the new train has to wait the last to enter the circuit
                 for train in self.__trainList:
-                    idTrain = int(train.getId())
-                    roadToCheck = ["E36","E35","E34","E33"]
-                    if idTrain > trainsToWait:
-                        if traci.vehicle.getRoadID(str(idTrain)).__eq__("E5"):
-                            if ((traci.vehicle.getRoadID(str(idTrain-1)).__eq__("E0") or traci.vehicle.getRoadID(str(idTrain-1)).__eq__("E6"))
-                                and self._freeRoad(roadToCheck)):
-                                if train.getSpeed() < train.getDefaultSpeed():
-                                    traci.vehicle.setSpeed(str(idTrain), train.getDefaultSpeed()+1)
-                                    train.setSpeed(train.getDefaultSpeed()+1)
-                                    traci.vehicle.setSpeedMode(train.getId(), 30)
-                            else:
-                                traci.vehicle.setSpeed(str(idTrain), train.getDefaultSpeed()*0.002)
-                                train.setSpeed(train.getDefaultSpeed()*0.002)
-                        if traci.vehicle.getRoadID(str(idTrain)).__eq__("E3"):
-                            if self._freeRoad(["E5"]):
-                                traci.vehicle.setSpeed(str(idTrain), train.getDefaultSpeed()*0.2)
-                                train.setSpeed(train.getDefaultSpeed()*0.2)
-                            else:
-                                traci.vehicle.setSpeed(str(idTrain), traci.vehicle.getSpeed(str(idTrain-1)))
-                                train.setSpeed(traci.vehicle.getSpeed(str(idTrain-1)))
+                    self._controlTrainIncoming(train)
                 
                 self._updateOldSpeed()
                 self.printAllSpeed()

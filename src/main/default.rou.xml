@@ -5,7 +5,7 @@
 
 	<route id="route0" edges="E1 E4 E0 E6"/>
 	<route id="route1" edges="E2 E0 E6"/>
-	<route id="route2" edges="E3 E5 E0 E6"/>
+	<route id="route2" edges="E3 E5 E55 E0 E6"/>
 
 	<vehicle id="0" type="rail0" route="route0" depart="0" />
 	<vehicle id="1" type="rail1" route="route1" depart="0" />

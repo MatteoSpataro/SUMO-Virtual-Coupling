@@ -38,6 +38,8 @@ def get_options():
                           help="Run the simulation without Virtual Coupling.")
     opt_parser.add_option("--maxTrains", action="store_true", default=False, 
                           help="Run the simulation with the maximum capacity: 30 trains.")
+    opt_parser.add_option("--variant", action="store_true", default=False, 
+                          help="Run the simulation in the circuit variant.")
     options, args = opt_parser.parse_args()
     return options
 
@@ -93,7 +95,7 @@ if __name__ == "__main__":
                 break
 
     setFileRou()
-    
+
     for i in range(4, nTrain+1):
         addTrainInFile(i)
             
@@ -101,7 +103,7 @@ if __name__ == "__main__":
         f.write('</routes>')
 
     if options.novc:
-        rbc = RbcNoVC(nTrain, DEPARTURE_INTERVAL)
+        rbc = RbcNoVC(nTrain, DEPARTURE_INTERVAL, options.variant)
 
         if nTrain == 30:
             print("You are running the simulation with the maximum  capacity: 30 trains.")
@@ -114,12 +116,8 @@ if __name__ == "__main__":
             if answer == 'Y' or answer == 'y':
                 changeSpeeds(rbc.getTrainList(),nTrain)
 
-        traci.start([sumoBinary, "-c", "railvc.sumocfg", "--tripinfo-output", "tripinfo.xml"])
-    
-        rbc.run()
     else:
-        rbc = RbcVC(nTrain, DEPARTURE_INTERVAL)             
-    
+        rbc = RbcVC(nTrain, DEPARTURE_INTERVAL, options.variant)             
         if options.setParam:
             print("\nSet the parameters of the simulation.")
             print("\nRemember that the distance expressed in SUMO is 10 times greater than the real one: "+
@@ -151,9 +149,11 @@ if __name__ == "__main__":
             if answer == 'Y' or answer == 'y':
                 changeSpeeds(rbc.getTrainList(),nTrain) 
 
+    if options.variant:
+        traci.start([sumoBinary, "-c", "railvc2.sumocfg", "--tripinfo-output", "tripinfo.xml"])
+    else:
         traci.start([sumoBinary, "-c", "railvc.sumocfg", "--tripinfo-output", "tripinfo.xml"])
-    
-        rbc.run()
+    rbc.run()
         
     if options.nogui:
         fine = input("\nPress Enter button to end the simulation.")

@@ -18,7 +18,7 @@ __email__ = "matteo.spataro@stud.unifi.it"
 
 MIN_NUMBER_OF_TRAINS = 3
 MAX_NUMBER_OF_TRAINS = 22
-DEPARTURE_INTERVAL = 22
+DEPARTURE_INTERVAL = 25
 DEFAULT_NET_FILE = "default.rou.xml"
 NET_FILE = "railvc.rou.xml"
 
@@ -44,8 +44,8 @@ def get_options():
     return options
 
 def changeSpeeds(trainList,nTrain):
-    MAX_DEFAULT_SPEED = 22
-    if nTrain > 15: MAX_DEFAULT_SPEED = 15
+    MAX_DEFAULT_SPEED = 21
+    if nTrain > 15: MAX_DEFAULT_SPEED = 18
     print("\nThe speed of the train must be between",
           MIN_SPEED,"and",MAX_DEFAULT_SPEED,"(",MIN_SPEED*10,"Km/h -",MAX_DEFAULT_SPEED*10,"Km/h).")
     for train in trainList:
@@ -73,7 +73,7 @@ def addTrainInFile(idTrain):
     with open(NET_FILE, 'a') as f:
         line = "<vType id=\"rail"+str(idTrain)+"\" priority=\"1\" vClass=\"rail\" length=\"100\" accel=\"0.7\" decel=\"0.7\" sigma=\"1.0\" maxSpeed=\"30\" guiShape=\"rail\" color=\""+colors[(idTrain)%10]+"\"/>\n"
         f.write(line)
-        depart = DEPARTURE_INTERVAL+1 + DEPARTURE_INTERVAL*(idTrain-4)
+        depart = DEPARTURE_INTERVAL + DEPARTURE_INTERVAL*(idTrain-3)
         line = "<vehicle id=\""+str(idTrain)+"\" type=\"rail"+str(idTrain)+"\" route=\"route2\" depart=\""+str(depart)+"\" />\n"
         f.write(line)
 

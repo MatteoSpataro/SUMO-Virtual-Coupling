@@ -26,7 +26,7 @@ import traci
 from rbc import Rbc
 
 DEFAULT_SPEED = 20.8
-MIN_SPEED = 10.0
+MIN_SPEED = 14.0
 MAX_SPEED = 30.0
 
 class RbcNoVC(Rbc):

@@ -25,18 +25,17 @@ import traci
 
 from rbc import Rbc
 
-DEFAULT_SPEED = 20.8
-MIN_SPEED = 14.0
-MAX_SPEED = 30.0
 
 class RbcNoVC(Rbc):
        
     def __init__(self, nTrain, DEPARTURE_INTERVAL, isVariant):
+        super().__init__()
         self.__trainList = [] #List of active trains
         self.__distances = [] #List with the distances between trains
         self.__incomingTrains = 0 #Number of trains that are coming
         self.DEPARTURE_INTERVAL = DEPARTURE_INTERVAL
         self.__distToPlot = [0] #To plot the distance graph between the first 2 trains
+        self.__variant = isVariant #If is True, than we are in the second version of the circuit
         if isVariant:
             self.__roadToCheck = ["E23","E22","E21","E20"]
         else:
@@ -44,8 +43,8 @@ class RbcNoVC(Rbc):
         self.__step = 1 #step of the simulation
 
         for idTrain in range(0, 3):
-            defaultSpeed = DEFAULT_SPEED - 0.8*idTrain
-            train = Train(str(idTrain), defaultSpeed)
+            defaultSpeed = self.DEFAULT_SPEED - 0.8*idTrain
+            train = Train(str(idTrain), defaultSpeed, self.DEFAULT_ACCEL, self.DEFAULT_DECEL)
             self.__trainList.append(train)
         self.__incomingTrains = nTrain - 3
 
@@ -84,11 +83,20 @@ class RbcNoVC(Rbc):
                     return False
         return True
 
+    # Check if the next Train is already loaded from SUMO.
+    def _isTrainLoaded(self):
+        idTrains = traci.vehicle.getIDList()
+        idNextTrain = str(int(self.__trainList[-1].getId())+1)
+        for id in idTrains:
+            if id.__eq__(idNextTrain):
+                return True
+        return False
+
     def _addTrain(self):
-        thirdTrain = self.__trainList[2]
-        newTrain = Train(str(int(self.__trainList[-1].getId())+1), thirdTrain.getDefaultSpeed())
+        lastTrain = self.__trainList[-1]
+        newTrain = Train(str(int(lastTrain.getId())+1), lastTrain.getDefaultSpeed(),
+                         self.DEFAULT_ACCEL, self.DEFAULT_DECEL)
         self.__trainList.append(newTrain)
-        traci.vehicle.setSpeed(newTrain.getId(), newTrain.getSpeed())
 
     #Method to plot the distance graph between the first 2 trains
     def _plotDist(self):
@@ -104,7 +112,6 @@ class RbcNoVC(Rbc):
 
     def run(self):
         traci.simulationStep()
-        trainsToWait = 10+math.floor(20-self.__trainList[0].getDefaultSpeed())
         for train in self.__trainList:
             traci.vehicle.setSpeed(train.getId(), train.getDefaultSpeed())
         #Start the run of the trains
@@ -113,8 +120,8 @@ class RbcNoVC(Rbc):
             if len(traci.vehicle.getIDList()) > 1:
                 self._updateTrainsActive()
                 #Check if there is an incoming train
-                if self.__incomingTrains > 0 and self._freeRoad(["E3"]):
-                    if self.__step > self.DEPARTURE_INTERVAL-1 and (self.__step%self.DEPARTURE_INTERVAL == 0):
+                if self.__incomingTrains > 0 :
+                    if self._isTrainLoaded():
                         self._addTrain()
                         self.__incomingTrains -= 1
                 self.__distances.clear()
@@ -122,38 +129,25 @@ class RbcNoVC(Rbc):
                 for train in self.__trainList:
                     distance = traci.vehicle.getFollower(train.getId(), 0) #[idFollower, distance]
                     self.__distances.append(distance[1])
+
+                self.printAllSpeed()
                 self.printDistances()
 
-                if traci.vehicle.getRoadID(self.__trainList[0].getId()).__eq__("E30"): 
-                    print("\n##### Set change of direction for Train", self.__trainList[0].getId())
+                road1 = "E30" #roadID where send the comand to the first train
+                road2 = "E31" #roadID where send the comand to the second train
+                if self.__variant:
+                    road1 = "E17"
+                    road2 = "E18"
+                if traci.vehicle.getRoadID(self.__trainList[0].getId()).__eq__(road1): 
+                    print("\n### Set change of direction for Train", self.__trainList[0].getId())
                     traci.vehicle.changeTarget(self.__trainList[0].getId(), "E48")
-
                 if len(self.__trainList)>2:
-                    if traci.vehicle.getRoadID(self.__trainList[1].getId()).__eq__("E31"): 
-                        print("\n##### Set change of direction for Train", self.__trainList[1].getId())
-                        traci.vehicle.changeTarget(self.__trainList[1].getId(), "E51")
-                
-                #if there are more than a cert amount of trains, the next has to wait the last to run
-                for train in self.__trainList:
-                    idTrain = int(train.getId())
-                    if idTrain > trainsToWait:
-                        if traci.vehicle.getRoadID(str(idTrain)).__eq__("E5"):
-                            if self._freeRoad(self.__roadToCheck):
-                                if train.getSpeed() < train.getDefaultSpeed():
-                                    traci.vehicle.setSpeed(str(idTrain), train.getDefaultSpeed()+1)
-                                    train.setSpeed(train.getDefaultSpeed()+1)
-                            else:
-                                traci.vehicle.setSpeed(str(idTrain), train.getDefaultSpeed()*0.005)
-                                train.setSpeed(train.getDefaultSpeed()*0.005)
-                        if traci.vehicle.getRoadID(str(idTrain)).__eq__("E3") and self._freeRoad(["E5"]):
-                            traci.vehicle.setSpeed(str(idTrain), train.getDefaultSpeed()*0.2)
-                            train.setSpeed(train.getDefaultSpeed()*0.2)
-                        if traci.vehicle.getRoadID(str(idTrain)).__eq__("E0"):
-                            traci.vehicle.setSpeed(str(idTrain), train.getDefaultSpeed())
-                            train.setSpeed(train.getDefaultSpeed())
-                
-                self.printAllSpeed()
-                if self.__incomingTrains > 0: print("Incoming trains:",self.__incomingTrains)
+                    if traci.vehicle.getRoadID(self.__trainList[1].getId()).__eq__(road2): 
+                        print("\n### Set change of direction for Train", self.__trainList[1].getId())
+                        traci.vehicle.changeTarget(self.__trainList[1].getId(), "E51")      
+
+                if self.__incomingTrains > 0: print("#\nIncoming trains:",self.__incomingTrains)
+
                 #To plot the distance graph you have to run these instructions
                 if self.__distances[0] != -1:
                     self.__distToPlot.append(self.__distances[0])

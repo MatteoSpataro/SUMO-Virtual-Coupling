@@ -4,8 +4,8 @@ import sys
 import optparse
 
 #Import "RbcVC" from "rbcNoise" instead of "rbcVc" to emulate a communication channel with noise, where the input can fail.
-from rbcVc import MIN_DIST_COUP, MAX_DIST_COUP, MIN_DIST_DECOUP, MAX_DIST_DECOUP, MIN_SPEED, MAX_SPEED, RbcVC
-from rbcNoVc import MIN_SPEED, MAX_SPEED, RbcNoVC
+from rbcVc import MIN_DIST_COUP, MAX_DIST_COUP, MIN_DIST_DECOUP, MAX_DIST_DECOUP, RbcVC
+from rbcNoVc import RbcNoVC
 
 from sumolib import checkBinary
 import traci
@@ -43,9 +43,9 @@ def get_options():
     options, args = opt_parser.parse_args()
     return options
 
-def changeSpeeds(trainList,nTrain):
+def changeSpeeds(trainList,nTrain, MIN_SPEED):
     MAX_DEFAULT_SPEED = 21
-    if nTrain > 15: MAX_DEFAULT_SPEED = 18
+    #if nTrain > 15: MAX_DEFAULT_SPEED = 18
     print("\nThe speed of the train must be between",
           MIN_SPEED,"and",MAX_DEFAULT_SPEED,"(",MIN_SPEED*10,"Km/h -",MAX_DEFAULT_SPEED*10,"Km/h).")
     for train in trainList:
@@ -67,11 +67,11 @@ def setFileRou():
                 wf.write(line)
 
 #Method to add a new train in the .rou.xml file
-def addTrainInFile(idTrain):
+def addTrainInFile(idTrain, rbc):
     idTrain = idTrain-1
     colors = ["1,1,0","1,0,0","0,1,0","0,1,1","0.1,0.3,1","1,0,1","0.3,0.9,0.9","1,0.5,0","1,0.2,0.2","0.9,0.9,0.9"]
     with open(NET_FILE, 'a') as f:
-        line = "<vType id=\"rail"+str(idTrain)+"\" priority=\"1\" vClass=\"rail\" length=\"100\" accel=\"0.7\" decel=\"0.7\" sigma=\"1.0\" maxSpeed=\"30\" guiShape=\"rail\" color=\""+colors[(idTrain)%10]+"\"/>\n"
+        line = "<vType id=\"rail"+str(idTrain)+"\" priority=\"1\" vClass=\"rail\" length=\"100\" accel=\""+str(rbc.DEFAULT_ACCEL)+"\" decel=\""+str(rbc.DEFAULT_DECEL)+"\" sigma=\"1.0\" maxSpeed=\"30\" guiShape=\"rail\" color=\""+colors[(idTrain)%10]+"\"/>\n"
         f.write(line)
         depart = DEPARTURE_INTERVAL + DEPARTURE_INTERVAL*(idTrain-3)
         line = "<vehicle id=\""+str(idTrain)+"\" type=\"rail"+str(idTrain)+"\" route=\"route2\" depart=\""+str(depart)+"\" />\n"
@@ -96,28 +96,15 @@ if __name__ == "__main__":
 
     setFileRou()
 
+    rbc = RbcNoVC(nTrain, DEPARTURE_INTERVAL, options.variant)  
+
     for i in range(4, nTrain+1):
-        addTrainInFile(i)
-            
+        addTrainInFile(i, rbc)
     with open(NET_FILE, 'a') as f:
         f.write('</routes>')
 
-    if options.novc:
-        rbc = RbcNoVC(nTrain, DEPARTURE_INTERVAL, options.variant)
-
-        if nTrain == 30:
-            print("You are running the simulation with the maximum  capacity: 30 trains.")
-            print("The default speed of the trains is 150 Km/h.")
-            trainList = rbc.getTrainList()
-            for train in trainList:
-                train.setDefaultSpeed(15)
-        else:
-            answer = input("\n\nDo you want change the default speed of the trains? (Y, N) ")
-            if answer == 'Y' or answer == 'y':
-                changeSpeeds(rbc.getTrainList(),nTrain)
-
-    else:
-        rbc = RbcVC(nTrain, DEPARTURE_INTERVAL, options.variant)             
+    if not options.novc:
+        rbc = RbcVC(nTrain, DEPARTURE_INTERVAL, options.variant)
         if options.setParam:
             print("\nSet the parameters of the simulation.")
             print("\nRemember that the distance expressed in SUMO is 10 times greater than the real one: "+
@@ -137,17 +124,18 @@ if __name__ == "__main__":
                           ," and ", MAX_DIST_DECOUP, ".")
                 else:
                     rbc.setDistanceDecoupling(distDecoupling)
-                    break   
-        if nTrain == 30:
-            print("You are running the simulation with the maximum  capacity: 30 trains.")
-            print("The default speed of the trains is 150 Km/h.")
-            trainList = rbc.getTrainList()
-            for train in trainList:
-                train.setDefaultSpeed(15)
-        else:
-            answer = input("\n\nDo you want change the default speed of the trains? (Y, N) ")
-            if answer == 'Y' or answer == 'y':
-                changeSpeeds(rbc.getTrainList(),nTrain) 
+                    break
+
+    if nTrain == 30:
+        print("You are running the simulation with the maximum  capacity: 30 trains.")
+        print("The default speed of the trains is 150 Km/h.")
+        trainList = rbc.getTrainList()
+        for train in trainList:
+            train.setDefaultSpeed(15)
+    else:
+        answer = input("\n\nDo you want change the default speed of the trains? (Y, N) ")
+        if answer == 'Y' or answer == 'y':
+            changeSpeeds(rbc.getTrainList(), nTrain, rbc.MIN_SPEED)
 
     if options.variant:
         traci.start([sumoBinary, "-c", "railvc2.sumocfg", "--tripinfo-output", "tripinfo.xml"])

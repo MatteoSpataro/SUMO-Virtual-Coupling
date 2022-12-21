@@ -8,6 +8,15 @@ __email__ = "matteo.spataro@stud.unifi.it"
 
 class Rbc(ABC):
 
+    def __init__(self):
+        super().__init__()
+        self.DEFAULT_SPEED = 20.0
+        self.MIN_SPEED = 14.0 #equals to 140 km/h
+        self.MAX_SPEED = 30.0 #equals to 300 km/h
+        self.DEFAULT_ACCEL = 0.7 #m/s^2
+        self.DEFAULT_DECEL = 0.7 #m/s^2
+        self.MAX_DECEL = 1.0 #m/s^2
+        
     @abstractmethod
     def getTrainList(self):
         pass

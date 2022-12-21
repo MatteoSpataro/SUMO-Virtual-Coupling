@@ -31,18 +31,13 @@ MIN_DIST_DECOUP = 45  #min distance of virtual decoupling
 MAX_DIST_DECOUP = 150 #max distance of virtual decoupling
 PARAM_COUPLING = 5.5  #VC policy parameter
 PARAM_DECOUPLING = 5.5
-DEFAULT_SPEED = 20.0
-MIN_SPEED = 14.0 #equals to 140 km/h
-MAX_SPEED = 30.0 #equals to 300 km/h
-DEFAULT_ACCEL = 0.7 #m/s^2
-DEFAULT_DECEL = 0.7 #m/s^2
-MAX_DECEL = 1.0 #m/s^2
 MAX_DISCONNECTIONS = 6 #max number of tolerated disconnections between trains
 MARGIN_VC = 0.1 #error margin of VC, equals to 10%
 
 class RbcVC(Rbc):
        
     def __init__(self, nTrain, DEPARTURE_INTERVAL, isVariant):
+        super().__init__()
         self.__distanceCoupling = 10    #equals to x10 real meters
         self.__distanceDecoupling = 100 #equals to x10 real meters
         self.__trainList = []  #List of active trains
@@ -66,8 +61,8 @@ class RbcVC(Rbc):
         self.__step = 1 #step of the simulation
         #initialize trainList:
         for idTrain in range(0, 3):
-            defaultSpeed = DEFAULT_SPEED - 0.8*idTrain
-            train = Train(str(idTrain), defaultSpeed, DEFAULT_ACCEL, DEFAULT_DECEL)
+            defaultSpeed = self.DEFAULT_SPEED - 0.8*idTrain
+            train = Train(str(idTrain), defaultSpeed, self.DEFAULT_ACCEL, self.DEFAULT_DECEL)
             self.__trainList.append(train)
         self.__incomingTrains = nTrain - 3
 
@@ -142,14 +137,17 @@ class RbcVC(Rbc):
 
     def _changeDecel(self, trainFollower, decelAhead, increment):
         newDecel = decelAhead+increment
-        if newDecel <= MAX_DECEL: trainFollower.setDecel(newDecel)
-        else: trainFollower.setDecel(MAX_DECEL)
+        if newDecel <= self.MAX_DECEL: trainFollower.setDecel(newDecel)
+        else: trainFollower.setDecel(self.MAX_DECEL)
 
     def _stepDecoupling(self, pos):
         trainAhead = self.__trainList[pos]
         trainFollower = self.__trainList[pos+1]
         if self.__distances[pos] == -1: return True
-        if self.__distances[pos] < self.__distanceDecoupling:    
+        # In the next condition, the distance is lower than real distance of decoupling 
+        # because it takes a few steps for the follower train to regain speed after decoupling,
+        # in which the distance between the two trains will increase.
+        if self.__distances[pos] < round(self.__distanceDecoupling-self.__distanceDecoupling*0.33, 5):    
             trainFollowerSpeed = self.__oldSpeed[pos+1]
             traci.vehicle.setSpeed(trainFollower.getId(), trainFollowerSpeed - 1)
             trainFollower.setSpeed(trainFollowerSpeed - 1)
@@ -177,12 +175,12 @@ class RbcVC(Rbc):
                     if self.__distances[posAhead] == -1: 
                         newSpeed = trainFollower.getSpeed()-0.3
                     elif speedFollower-speedAhead >= 1.5:
-                        if decelAhead < MAX_DECEL:
+                        if decelAhead < self.MAX_DECEL:
                             newSpeed = speedFollower*0.40 
                             self._changeDecel(trainFollower, decelAhead, 0.040)
                         else:
                             newSpeed = 0.1 
-                            trainFollower.setDecel(MAX_DECEL)
+                            trainFollower.setDecel(self.MAX_DECEL)
                     elif self.__distances[posAhead] <= self.__distanceCoupling+self.__distanceCoupling*0.50:
                         newSpeed = speedAhead*0.40
                         self._changeDecel(trainFollower, decelAhead, 0.025)
@@ -218,8 +216,8 @@ class RbcVC(Rbc):
                     trainBehind = self.__trainList[posAhead+1]
                     traci.vehicle.setSpeed(trainBehind.getId(), trainFollower.getSpeed())
                     trainBehind.setSpeed(trainFollower.getSpeed())
-                    if trainBehind.getDecel() > DEFAULT_DECEL:
-                        traci.vehicle.setDecel(trainBehind.getId(), DEFAULT_DECEL)
+                    if trainBehind.getDecel() > self.DEFAULT_DECEL:
+                        traci.vehicle.setDecel(trainBehind.getId(), self.DEFAULT_DECEL)
                     print("\nIn decoupling, Train", trainBehind.getId(), "reset the speed.")
             return False
         return True
@@ -277,7 +275,7 @@ class RbcVC(Rbc):
                 traci.vehicle.setDecel(trainFollower.getId(), trainFollower.getDecel())
             return True
         self.__countDisconnection[pos] = 0
-        traci.vehicle.setDecel(trainFollower.getId(), DEFAULT_DECEL)
+        traci.vehicle.setDecel(trainFollower.getId(), self.DEFAULT_DECEL)
         # Check if the trains are too near
         if self.__distances[pos] > 0 and self.__distances[pos] <= self.__distanceCoupling*0.50:
             print("Train", trainFollower.getId(), "coupling 0.")
@@ -293,7 +291,7 @@ class RbcVC(Rbc):
             self.__state[pos] = "coupled"
             return False
         if self.__distances[pos] >= self.__distanceDecoupling*PARAM_DECOUPLING:
-            if speedDiff < 3.5 and trainFollowerSpeed < MAX_SPEED-1:
+            if speedDiff < 3.5 and trainFollowerSpeed < self.MAX_SPEED-1:
                 print("Train", trainFollower.getId(), "coupling 1.")
                 self._increase(trainFollower, trainFollowerSpeed, 1)
                 trainFollower.setAccel(trainAhead.getAccel())
@@ -303,7 +301,7 @@ class RbcVC(Rbc):
         elif self.__distances[pos] >= self.__distanceDecoupling:
             if self.__distances[pos] < self.__distanceDecoupling*2.0:
                 self.__state[pos] = "almost_coupled"
-            if speedDiff <= 1.5 and trainFollowerSpeed < MAX_SPEED-1:
+            if speedDiff <= 1.5 and trainFollowerSpeed < self.MAX_SPEED-1:
                 print("Train", trainFollower.getId(), "coupling 3.")
                 self._increase(trainFollower, trainFollowerSpeed, 1)
                 trainFollower.setAccel(trainAhead.getAccel())
@@ -312,7 +310,7 @@ class RbcVC(Rbc):
                 self._decrease(trainFollower, trainFollowerSpeed, -1)
         elif self.__distances[pos] >= self.__distanceCoupling*PARAM_COUPLING + 5*self.__factorSpeed:
             self.__state[pos] = "almost_coupled"
-            if speedDiff < 1.5 and trainFollowerSpeed < MAX_SPEED-1:
+            if speedDiff < 1.5 and trainFollowerSpeed < self.MAX_SPEED-1:
                 print("Train", trainFollower.getId(), "coupling 5.")
                 self._increase(trainFollower, trainFollowerSpeed, 1)
                 trainFollower.setAccel(trainAhead.getAccel())
@@ -325,7 +323,7 @@ class RbcVC(Rbc):
             if speedDiff > 3:
                 print("Train", trainFollower.getId(), "coupling 7.")
                 self._decrease(trainFollower, trainFollowerSpeed, -4)
-                self._changeDecel(trainFollower, 1, MAX_DECEL)
+                self._changeDecel(trainFollower, 1, self.MAX_DECEL)
             elif speedDiff > 2.5:
                 print("Train", trainFollower.getId(), "coupling 8.")
                 self._decrease(trainFollower, trainFollowerSpeed, -2.5)
@@ -451,7 +449,7 @@ class RbcVC(Rbc):
     def _addTrain(self):
         lastTrain = self.__trainList[-1]
         newTrain = Train(str(int(lastTrain.getId())+1), lastTrain.getDefaultSpeed(),
-                         DEFAULT_ACCEL, DEFAULT_DECEL)
+                         self.DEFAULT_ACCEL, self.DEFAULT_DECEL)
         self.__trainList.append(newTrain)
         traci.vehicle.setSpeed(newTrain.getId(), newTrain.getSpeed())
         self.__oldSpeed.append(0.0)

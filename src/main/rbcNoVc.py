@@ -28,18 +28,13 @@ from rbc import Rbc
 
 class RbcNoVC(Rbc):
        
-    def __init__(self, nTrain, DEPARTURE_INTERVAL, isVariant):
+    def __init__(self, nTrain, isVariant):
         super().__init__()
         self.__trainList = [] #List of active trains
         self.__distances = [] #List with the distances between trains
         self.__incomingTrains = 0 #Number of trains that are coming
-        self.DEPARTURE_INTERVAL = DEPARTURE_INTERVAL
         self.__distToPlot = [0] #To plot the distance graph between the first 2 trains
         self.__variant = isVariant #If is True, than we are in the second version of the circuit
-        if isVariant:
-            self.__roadToCheck = ["E23","E22","E21","E20"]
-        else:
-            self.__roadToCheck = ["E36","E35","E34","E33"]
         self.__step = 1 #step of the simulation
 
         for idTrain in range(0, 3):

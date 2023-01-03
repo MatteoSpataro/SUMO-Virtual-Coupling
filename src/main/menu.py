@@ -17,9 +17,9 @@ __maintainer__ = "Matteo Spataro"
 __email__ = "matteo.spataro@stud.unifi.it"
 
 MIN_NUMBER_OF_TRAINS = 3
-MAX_NUMBER_OF_TRAINS = 22
+MAX_NUMBER_OF_TRAINS = 30
 DEPARTURE_INTERVAL = 25
-DEFAULT_NET_FILE = "default.rou.xml"
+DEFAULT_FILE = "default.rou.xml"
 NET_FILE = "railvc.rou.xml"
 
 if 'SUMO_HOME' in os.environ:
@@ -43,25 +43,28 @@ def get_options():
     options, args = opt_parser.parse_args()
     return options
 
-def changeSpeeds(trainList,nTrain, MIN_SPEED):
+def changeSpeeds(trainList, MIN_SPEED):
     MAX_DEFAULT_SPEED = 21
-    #if nTrain > 15: MAX_DEFAULT_SPEED = 18
     print("\nThe speed of the train must be between",
           MIN_SPEED,"and",MAX_DEFAULT_SPEED,"(",MIN_SPEED*10,"Km/h -",MAX_DEFAULT_SPEED*10,"Km/h).")
     for train in trainList:
-        loop = True
-        while loop:
+        tries = 0
+        while tries < 15:
             print("\nSet the speed of the Train", train.getId())
             newSpeed = float(input(": "))
             if (newSpeed < MIN_SPEED) or (newSpeed > MAX_DEFAULT_SPEED):
                 print("\nThe speed of the train must be between",MIN_SPEED,"and",MAX_DEFAULT_SPEED,".")
+                tries = tries + 1
             else:
                 train.setDefaultSpeed(newSpeed)
-                loop = False
+                break
+        if tries == 15: 
+            print("\nThe maximum number of attempts has been reached.")
+            quit()
 
 #Method to reset the .rou.xml file for a new simulation
 def setFileRou():
-    with open(DEFAULT_NET_FILE, 'r') as rf:
+    with open(DEFAULT_FILE, 'r') as rf:
         with open(NET_FILE, 'w') as wf:
             for line in rf:
                 wf.write(line)
@@ -87,16 +90,21 @@ if __name__ == "__main__":
     if options.maxTrains:
         nTrain = 30
     else:
-        while True:
+        tries = 0
+        while tries < 15:
             nTrain = int(input("\nSet the number of trains: "))
             if (nTrain < MIN_NUMBER_OF_TRAINS or nTrain > MAX_NUMBER_OF_TRAINS):
                 print("\nThe number of trains must be between",MIN_NUMBER_OF_TRAINS,"and",MAX_NUMBER_OF_TRAINS)
+                tries = tries + 1
             else:
                 break
+        if tries == 15: 
+            print("\nThe maximum number of attempts has been reached.")
+            quit()
 
     setFileRou()
 
-    rbc = RbcNoVC(nTrain, DEPARTURE_INTERVAL, options.variant)  
+    rbc = RbcNoVC(nTrain, options.variant)  
 
     for i in range(4, nTrain+1):
         addTrainInFile(i, rbc)
@@ -109,24 +117,29 @@ if __name__ == "__main__":
             print("\nSet the parameters of the simulation.")
             print("\nRemember that the distance expressed in SUMO is 10 times greater than the real one: "+
                   "to set a distance of 100 meters real you need to enter '10'.")
-            while True:
+            tries = 0
+            while tries < 15:
                 distCoupling = float(input("\nSet the distance of virtual coupling (default = "+str(rbc.getDistanceCoupling())+"): "))
                 if (distCoupling < MIN_DIST_COUP) or (distCoupling > MAX_DIST_COUP):
                     print("\nThe distance of virtual coupling must be between ", MIN_DIST_COUP
                           ," and ", MAX_DIST_COUP, ".")
+                    tries = tries + 1
                 else:
                     rbc.setDistanceCoupling(distCoupling)
                     break
-            while True:
+            while tries < 15:
                 distDecoupling = float(input("\nSet the distance of virtual decoupling (default = "+str(rbc.getDistanceDecoupling())+"): "))
                 if (distDecoupling < MIN_DIST_DECOUP) or (distDecoupling > MAX_DIST_DECOUP):
                     print("\nThe distance of virtual decoupling must be between ", MIN_DIST_DECOUP
                           ," and ", MAX_DIST_DECOUP, ".")
+                    tries = tries + 1
                 else:
                     rbc.setDistanceDecoupling(distDecoupling)
                     break
-
-    if nTrain == 30:
+            if tries == 15: 
+                print("\nThe maximum number of attempts has been reached.")
+                quit()
+    if options.maxTrains:
         print("You are running the simulation with the maximum  capacity: 30 trains.")
         print("The default speed of the trains is 150 Km/h.")
         trainList = rbc.getTrainList()
@@ -135,7 +148,7 @@ if __name__ == "__main__":
     else:
         answer = input("\n\nDo you want change the default speed of the trains? (Y, N) ")
         if answer == 'Y' or answer == 'y':
-            changeSpeeds(rbc.getTrainList(), nTrain, rbc.MIN_SPEED)
+            changeSpeeds(rbc.getTrainList(), rbc.MIN_SPEED)
 
     if options.variant:
         traci.start([sumoBinary, "-c", "railvc2.sumocfg", "--tripinfo-output", "tripinfo.xml"])

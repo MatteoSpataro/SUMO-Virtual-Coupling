@@ -25,7 +25,7 @@ import traci
 
 from rbc import Rbc
 
-MIN_DIST_COUP = 3.0       #min distance of virtual coupling
+MIN_DIST_COUP = 5       #min distance of virtual coupling
 MAX_DIST_COUP = 50      #max distance of virtual coupling
 MIN_DIST_DECOUP = 45    #min distance of virtual decoupling
 MAX_DIST_DECOUP = 150   #max distance of virtual decoupling
@@ -46,7 +46,7 @@ class RbcVC(Rbc):
         self.__couplingTrain = [True]    #Train is trying to reach the coupling if is "True"
         self.__decouplingTrain = [False] #Train is trying to reach the decoupling if is "True"
         self.__state = ["decoupled"] #List with the state of each train
-        self.__isBraking = [False]   #Is "True" if the train ahead is braking
+        self.__isBraking = [False]   #The i-th element is "True" if the i-th train is braking
         self.__incomingTrains = 0    #Number of trains that are coming
         self.__countDisconnection = [0]  #Number of sequential disconnections for each train
         self.DEPARTURE_INTERVAL = DEPARTURE_INTERVAL
@@ -126,6 +126,7 @@ class RbcVC(Rbc):
         for (pos, train) in enumerate(self.__trainList):
             print("--Train", train.getId(), ":", round(self.__oldSpeed[pos],4),
                   " # Decel:", round(traci.vehicle.getDecel(train.getId()),4))
+        print("\n#######\n")
 
     #Method to set the velocity profile of the trainAhead into the trainFollower.
     def _setSameSpeedFactores(self, trainFollower, trainAhead):
@@ -392,12 +393,13 @@ class RbcVC(Rbc):
         if self.__state[pos].__eq__("almost_coupled"): self.__state[pos] = "coupled"
 
     def printDistances(self):
-        print("\nDistance between trains: ")
+        print("Distance between trains: ")
         for i in range(0, len(self.__trainList)-1):
             if self.__distances[i] != -1:
                 print("---T", self.__trainList[i].getId(), " and T", int(self.__trainList[i].getId())+1, ": ", self.__distances[i], "m.")
             else:
                 print("---T", self.__trainList[i].getId(), " and T", int(self.__trainList[i].getId())+1, ": undefined.")
+        print("\n#######")
 
     # Read the acceleration and deceleration of a trains in the simulation
     def _readAccelDecel(self, train):
@@ -549,7 +551,6 @@ class RbcVC(Rbc):
                     distance = traci.vehicle.getFollower(train.getId(), 0) #getFollower() -> [idFollower, distance]
                     self.__distances.append(distance[1])
                 self.printDistances()
-                print("\n")
                 #Change the limit on the distance for a train that is in the right roadID
                 for train in self.__trainList:
                     if train.getId().__eq__("0"):
@@ -563,6 +564,8 @@ class RbcVC(Rbc):
                 stepsToWait = 250 #steps to wait before the first change of a train's direction
                 if self.__trainList[0].getDefaultSpeed() <= 15: 
                     stepsToWait = 250+25*self.__factorSpeed
+                if len(self.__trainList) == 3: 
+                    stepsToWait = 400
                 if self.__step > stepsToWait:
                     road1 = "E30" #roadID where send the comand to the first train
                     road2 = "E31" #roadID where send the comand to the second train

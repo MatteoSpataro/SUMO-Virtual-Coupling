@@ -3,7 +3,10 @@ import os
 import sys
 import optparse
 
-#Import "RbcVC" from "rbcNoise" instead of "rbcVc" to emulate a communication channel with noise, where the input can fail.
+#Import "RbcVC" from "rbcNoise" instead of "rbcVc" to emulate a communication channel with noise, 
+# where the communication between SUMO and RBC can fail.
+
+#from rbcNoise import MIN_DIST_COUP, MAX_DIST_COUP, MIN_DIST_DECOUP, MAX_DIST_DECOUP, RbcVC
 from rbcVc import MIN_DIST_COUP, MAX_DIST_COUP, MIN_DIST_DECOUP, MAX_DIST_DECOUP, RbcVC
 from rbcNoVc import RbcNoVC
 
@@ -17,7 +20,7 @@ __maintainer__ = "Matteo Spataro"
 __email__ = "matteo.spataro@stud.unifi.it"
 
 MIN_NUMBER_OF_TRAINS = 3
-MAX_NUMBER_OF_TRAINS = 30
+MAX_NUMBER_OF_TRAINS = 22
 DEPARTURE_INTERVAL = 25
 DEFAULT_FILE = "default.rou.xml"
 NET_FILE = "railvc.rou.xml"

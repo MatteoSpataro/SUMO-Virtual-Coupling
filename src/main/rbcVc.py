@@ -36,7 +36,7 @@ MARGIN_VC = 0.1         #error margin of VC, equals to 10%
 
 class RbcVC(Rbc):
        
-    def __init__(self, nTrain, DEPARTURE_INTERVAL, isVariant):
+    def __init__(self, nTrain, isVariant):
         super().__init__()
         self.__distanceCoupling = 10    #equals to x10 real meters
         self.__distanceDecoupling = 100 #equals to x10 real meters
@@ -49,7 +49,6 @@ class RbcVC(Rbc):
         self.__isBraking = [False]   #The i-th element is "True" if the i-th train is braking
         self.__incomingTrains = 0    #Number of trains that are coming
         self.__countDisconnection = [0]  #Number of sequential disconnections for each train
-        self.DEPARTURE_INTERVAL = DEPARTURE_INTERVAL
         self.__factorSpeed = 6  #Parameter used during the coupling step
         self.__variant = isVariant #If is True, than we are in the second version of the circuit
         if isVariant:
@@ -168,8 +167,6 @@ class RbcVC(Rbc):
                 if self.__state[posAhead].__eq__("coupled"):
                     newSpeed = speedAhead
                     self._changeDecel(trainFollower, decelAhead, 0.010)
-                    #if self.__oldSpeed[posAhead] != self.__oldSpeed[posAhead+1]:
-                    #    self.__state[posAhead] = "almost_coupled"
                     traci.vehicle.setSpeed(idFollower, newSpeed)
                     trainFollower.setSpeed(newSpeed)
                 if self.__state[posAhead].__eq__("almost_coupled"):

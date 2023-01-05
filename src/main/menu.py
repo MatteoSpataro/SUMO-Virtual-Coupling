@@ -49,7 +49,7 @@ def get_options():
 def changeSpeeds(trainList, MIN_SPEED):
     MAX_DEFAULT_SPEED = 21
     print("\nThe speed of the train must be between",
-          MIN_SPEED,"and",MAX_DEFAULT_SPEED,"(",MIN_SPEED*10,"Km/h -",MAX_DEFAULT_SPEED*10,"Km/h).")
+          MIN_SPEED,"and",MAX_DEFAULT_SPEED,"(",MIN_SPEED*10,"km/h -",MAX_DEFAULT_SPEED*10,"km/h).")
     for train in trainList:
         tries = 0
         while tries < 15:
@@ -115,8 +115,8 @@ if __name__ == "__main__":
         f.write('</routes>')
 
     if not options.novc:
-        rbc = RbcVC(nTrain, DEPARTURE_INTERVAL, options.variant)
-        if options.setParam:
+        rbc = RbcVC(nTrain, options.variant)
+        if options.setParam and not options.maxTrains:
             print("\nSet the parameters of the simulation.")
             print("\nRemember that the distance expressed in SUMO is 10 times greater than the real one: "+
                   "to set a distance of 100 meters real you need to enter '10'.")
@@ -144,7 +144,7 @@ if __name__ == "__main__":
                 quit()
     if options.maxTrains:
         print("You are running the simulation with the maximum  capacity: 30 trains.")
-        print("The default speed of the trains is 150 Km/h.")
+        print("The default speed of the trains is 150 km/h.")
         trainList = rbc.getTrainList()
         for train in trainList:
             train.setDefaultSpeed(15)

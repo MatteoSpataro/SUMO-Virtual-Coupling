@@ -1,7 +1,7 @@
 <routes>
-	<vType id="rail0" priority="4" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="1,1,0"/>
-	<vType id="rail1" priority="3" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="1,0,0"/>
-	<vType id="rail2" priority="2" vClass="rail" length="100" accel="0.7" decel="0.7" sigma="1.0" maxSpeed="30" guiShape="rail" color="0,1,0"/>
+	<vType id="rail0" priority="4" vClass="rail" length="100" accel="1.1" decel="1.1" sigma="1.0" maxSpeed="30" guiShape="rail" color="1,1,0"/>
+	<vType id="rail1" priority="3" vClass="rail" length="100" accel="1.1" decel="1.1" sigma="1.0" maxSpeed="30" guiShape="rail" color="1,0,0"/>
+	<vType id="rail2" priority="2" vClass="rail" length="100" accel="1.1" decel="1.1" sigma="1.0" maxSpeed="30" guiShape="rail" color="0,1,0"/>
 
 	<route id="route0" edges="E1 E4 E0 E6"/>
 	<route id="route1" edges="E2 E0 E6"/>
